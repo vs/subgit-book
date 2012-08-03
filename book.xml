@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<book xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0">
+    <bookinfo>
+        <title>Practical Guide To SubGit</title>
+        <subtitle>Safe Svn to Git Migration</subtitle>
+        <releaseinfo/>
+        <copyright>
+            <year>2012</year>
+            <holder>TMate Software</holder>
+        </copyright>
+        <legalnotice>
+            <para>This work is licensed under a <link xl:href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</link>.
+            </para>
+        </legalnotice>
+        <author>
+            <firstname>Alexander</firstname>
+            <surname>Kitaev</surname>
+        </author>
+    </bookinfo>   
+
+    
+    <chapter id="introduction">
+        <title>Introduction to SubGit</title>
+    </chapter>
+
+    <chapter id="configuration">
+        <title>SubGit Configuration</title>
+    </chapter>
+    <chapter id="installation">
+        <title>SubGit Installation</title>
+    </chapter>
+
+    <chapter id="linux-apache">
+        <title>Subversion and Git over HTTP with Apache Web Server</title>
+    </chapter>
+    <chapter id="linux-ssh">
+        <title>Subversion and Git over SSH protocol</title>
+    </chapter>
+    <chapter id="linux-shared">
+        <title>Subversion over SSH and Git over HTTP protocol</title>
+    </chapter>
+    <chapter id="linux-gitolite">
+        <title>Using SubGit with Gitolite system</title>
+    </chapter>
+    <chapter id="linux-issues">
+        <title>Troubleshooting SubGit on Linux / OS X</title>
+    </chapter>
+    
+    <chapter id="windows">
+        <title>Installing SubGit on Windows</title>
+    </chapter>
+    <chapter id="windows-visualsvn">
+        <title>SubGit with VisualSVN</title>
+    </chapter>
+    <chapter id="windows-ubersvn">
+        <title>SubGit with WANDisco uberSVN on Windows</title>
+    </chapter>
+    <chapter id="windows-issues">
+        <title>Troubleshooting SubGit on Windows</title>
+    </chapter>
+    
+    <chapter id="registration">
+        <title>SubGit Registration</title>
+    </chapter>
+
+</book>
