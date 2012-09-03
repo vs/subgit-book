@@ -20,7 +20,47 @@
 
     
     <chapter id="introduction">
-        <title>Introduction to SubGit</title>
+        <title>Overview</title>
+        <para>SubGit is a tool for bidirectional Subversion and Git repositories synchronization. 
+              SubGit is written in Java and works on the server side, i.e. requires direct access to both Subversion and Git repositories over local file system.
+        </para>
+        <para>Most commonly, SubGit user starts with Subversion repository being configured on the server. 
+              Access to Subversion repository is availaibe over network (with HTTP(s), plain svn or svn over SSH protocols) and over the local file system. 
+              Correspondingly, users requests are handled by Apache Web Server, svnserve daemon or sshd daemon which invokes svnserve process. 
+              <xref xrefstyle="select: label" linkend="start"/> shows a generic outline of the described configuration.
+       </para>               
+       <para>           
+           <figure id="start"><title>Common Subversion Setup</title>
+           <mediaobject><imageobject><imagedata scale="105" fileref="images/start.png"/></imageobject></mediaobject>
+           </figure>
+        </para>
+        <para>SubGit creates one or more Git repositories alongside with the existing Subversion repository and translates existing Subversion revisions into Git 
+              commits. After that, SubGit configures Subversion and Git hook scripts so, that changes made in the Subversion repository are instantly translated 
+              into Git repository and vice versa. <xref xrefstyle="select: label" linkend="subgit"/> shows the server with SubGit being installed. 
+              SubGit grants users with a choice of using either Git or Subversion.
+        </para> 
+        <para>
+           <figure id="subgit"><title>Server with SubGit installed</title>
+           <mediaobject><imageobject><imagedata scale="115" fileref="images/subgit.png"/></imageobject></mediaobject>
+           </figure>
+        </para>
+        <formalpara><title>Chapter summary:</title>
+        <para>
+        <itemizedlist>
+        <listitem>SubGit needs direct access to Subversion repository over filesystem</listitem>
+        <listitem>SubGit creates Git repositories and translates existing Subversion revisions into Git commits</listitem>
+        <listitem>SubGit uses standard hooks mechanism to keep Subversion and Git repositories synchronized</listitem>
+        <listitem>SubGit grants users with a choice of whether to use Git or Subversion</listitem>
+        </itemizedlist>
+        </para>
+        </formalpara>
+    </chapter>
+
+    <chapter id="translation">
+        <title>Translation</title>
+        <para>Subversion repository may contain one or more projects. During installation SubGit detects those projects or
+              locations and creates Git repository for each of the detected location.  
+        </para>
     </chapter>
 
     <chapter id="configuration">
