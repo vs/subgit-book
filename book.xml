@@ -57,17 +57,177 @@
     </chapter>
 
     <chapter id="translation">
-        <title>Translation</title>
-        <para>Subversion repository may contain one or more projects. During installation SubGit detects those projects or
-              locations and creates Git repository for each of the detected location.  
+        <title>Translation Configuration Overview</title>
+        <para>To synchronize Subversion and Git repositories, SubGit maps entities of one system to those of another. 
+        For every Subversion repository the following mappings are established and used by SubGit: 
+        <itemizedlist>
+        <listitem>Projects in Subversion repository are mapped to the Git repositories</listitem>
+        <listitem>Each project branches and tags are mapped to Git branch and tag references</listitem>
+        <listitem>Subversion users are mapped to Git committers</listitem>
+        </itemizedlist>
+        Above mappings are static and configured for Subversion repository once before translation and synchronization is started. 
+        All mappings are stored in <code>subgit.conf</code> configuration file. Following sections describe these mappings in more details.
         </para>
+
+        <note><title>Note:</title>
+        <para>
+        Subversion is a very powerful system and sets mostly no limits on the repository layout. Hence, it may not be always possible to define necessary mappings 
+        for any project stored in Subversion repository found out there in the wild. Such unmappable projects would not be handled by SubGit. 
+        However, for most of the Subversion repositories in production use, mappings could be defined and, in most cases,
+        they are detected automatically by SubGit. 
+        </para>
+        </note>
+
+        <sect1><title>Projects mapping</title>
+        <para>  
+        Subversion repository may contain one or more projects. Project is a location (folder) in Subversion repository which follows Subversion recommended repository
+        layout, i.e. project folder has <emphasis>trunk</emphasis>, <emphasis>branches</emphasis> and <emphasis>tags</emphasis> subfolders:
+        <literallayout><code>/project
+   /trunk    # project's "main line"
+   /branches # contains project feature and version branches, copied from trunk or other branches
+   /tags     # contains project tags (trunk and branches snapshots)</code></literallayout>
+        It is not necessary for <emphasis>trunk</emphasis>, <emphasis>branches</emphasis> and <emphasis>tags</emphasis> folders to have these exact names, but the roles 
+        of these folders are important. Each project could be mapped to a bare Git repository as shown
+        in <xref xrefstyle="select: label" linkend="single"/> and <xref xrefstyle="select: label" linkend="multi"/> along with the corresponding 
+        parts of SubGit configuration file.  
+        <figure id="single"><title>Single Project Repository Mapping</title>
+        <mediaobject><imageobject><imagedata scale="105" fileref="images/single.png"/></imageobject></mediaobject>
+        </figure>
+        <figure id="single-config"><title>SubGit configuration file (single project mapping)</title>
+        <literallayout><code>        [location "default"]
+        # project location within Subversion repository
+        translationRoot = /
+        
+        # file system path of the mapped Git repository
+        repository = .git</code></literallayout>
+        </figure>
+        <figure id="multi"><title>Multiple Projects Repository Mapping</title>
+        <mediaobject><imageobject><imagedata scale="105" fileref="images/multi.png"/></imageobject></mediaobject>
+        </figure>
+        <figure id="multi-config"><title>SubGit configuration file (two projects mapping)</title>
+        <literallayout><code>        [location "project1"]
+        # project location within Subversion repository
+        translationRoot = /project1
+        
+        # file system path of the mapped Git repository
+        repository = git/project1.git
+        ...
+        
+        [location "project2"]
+        # project location within Subversion repository
+        translationRoot = /project2
+        
+        # file system path of the mapped Git repository
+        repository = git/project2.git</code></literallayout>
+        </figure>
+        </para></sect1>
+
+        <sect1><title>Branches and Tags mapping</title>
+        <para>
+        For each project mapped to a Git repository, branches and tags are mapped to the corresponding references in the Git repository.
+        SubGit distinguishes the following folders in Subversion project as branches or tags:
+        <itemizedlist>
+        <listitem>trunk folder</listitem>
+        <listitem>folders in the dedicated branches folder</listitem>
+        <listitem>folders in the dedicated shelves folder</listitem>
+        <listitem>folders in the dedicated tags folder</listitem>
+        </itemizedlist>
+        </para>
+        <para>Shelves are special kind of branches used by SubGit to represent Git anonymous branches in Subversion repository.</para>
+        <para>
+        Each folder is mapped to the reference (branch or tag) in the Git repository. For trunk folder the mapping is one-to-one as there 
+        could be only one trunk folder (as well as only one master reference in Git) and for other folders wildcard mapping is used. Default mapping and 
+        corresponding SubGit configuration file part is shown in <xref xrefstyle="select: label" linkend="mapping"/>  and <xref xrefstyle="select: label" linkend="mapping-config"/>.
+        </para>
+        <para>Whenever project uses standard folder names (i.e. trunk, branches and tags), SubGit would automatically detect and configure mapping for that project. Otherwise
+        configuration would have to be manually adjusted to include proper paths and references names.</para>
+        <para>  
+        <figure id="mapping"><title>Default Branches and Tags Mapping</title>
+        <mediaobject><imageobject><imagedata scale="80" fileref="images/mapping.png"/></imageobject></mediaobject>
+        </figure>
+        <figure id="mapping-config"><title>SubGit configuration file (default branches and tags mapping)</title>
+        <literallayout><code>        [location "default"]
+        translationRoot = /
+        repository = .git
+        
+        # branches and tags mapping in form of
+        # branchKind=Subversion-Path-Pattern:Git-Reference-Pattern
+        
+        trunk = trunk:refs/heads/master
+        branches = branches/*:refs/heads/*
+        shelves = shelves/*:refs/shelves/*
+        tags = tags/*:refs/tags/*</code></literallayout>
+        </figure>
+        </para>
+        <para>  
+        Notice that project2 in <xref xrefstyle="select: label" linkend="multi"/> features
+        non-standard names for <emphasis>trunk</emphasis>, <emphasis>branches</emphasis> and <emphasis>tags</emphasis> folders. <xref xrefstyle="select: label" linkend="mapping-names"/> shows
+        mapping configuration for that project.
+        <figure id="mapping-names"><title>SubGit configuration file (non-stadard folders names)</title>
+        <literallayout><code>        [location "default"]
+        translationRoot = /
+        repository = .git
+        
+        # branches and tags mapping in form of
+        # branchKind=Subversion-Path-Pattern:Git-Reference-Pattern
+        
+        trunk = main:refs/heads/master
+        branches = versions/*:refs/heads/*
+        shelves = shelves/*:refs/shelves/*
+        tags = stamps/*:refs/tags/*</code></literallayout>
+        </figure>
+        </para>
+        <para><xref xrefstyle="select: label" linkend="multi-combined"/> outlines combined project and branches mappings for two projects Subversion repository.   
+        <figure id="multi-combined"><title>Project and Branches Mapping</title>
+        <mediaobject><imageobject><imagedata scale="105" fileref="images/multi-combined.png"/></imageobject></mediaobject>
+        </figure>
+        </para>
+        </sect1>
+        
+        <sect1><title>Authors Mapping</title>
+        <para>By default there is no explicit authors mapping and the following rules are used for translation:
+        <itemizedlist>
+        <listitem>Subversion "<code>svn_user_name</code>" is translated to "<code>svn_user_name &lt;&gt;</code>" in Git</listitem>
+        <listitem>Git "<code>Author Name &lt;email@domain.com&gt;</code>" is translated to "<code>Author Name</code>" in Subversion</listitem>
+        </itemizedlist>
+        </para>
+        
+        <para>
+        Additionally to the default rule, explicit authors mapping may be provided by SubGit configuration. Authors mapping is stored in a separate 
+        text file which is looked at <code>SVN_REPOS/conf/authors.txt</code> by default.  
+        <figure id="authors.txt"><title>SVN_REPOS/conf/authors.txt file</title>
+        <literallayout><code>svn_user_name = Git Name &lt;name@email.com&gt;</code></literallayout></figure>
+        Default authors.txt location may be changed in SubGit configuration file. 
+        <figure id="authors.txt"><title>SubGit configuration file defines authors.txt location</title>
+        <literallayout><code>        [core]
+        ...
+        # location of the authors mapping file        
+        authorsFile = conf/authors.txt
+        ...</code></literallayout></figure>
+        Authors mapping file (authors.txt) contents may be altered at any time and new mapping becomes effective immediately. 
+        </para>        
+        </sect1>
     </chapter>
 
-    <chapter id="configuration">
-        <title>SubGit Configuration</title>
-    </chapter>
     <chapter id="installation">
-        <title>SubGit Installation</title>
+        <title>SubGit Configuration and Installation</title>
+    </chapter>
+
+    <chapter id="installation">
+        <title>Changing SubGit Configuration</title>
+    </chapter>
+
+    <chapter id="reference">
+        <title>SubGit Reference</title>
+        <sect1>
+        <title>SubGit Files</title>
+        </sect1>
+        <sect1>
+        <title>Configuration Optinons</title>
+        </sect1>
+        <sect1>
+        <title>Command Line Reference</title>
+        </sect1>
     </chapter>
 
     <chapter id="linux-apache">
@@ -78,9 +238,6 @@
     </chapter>
     <chapter id="linux-shared">
         <title>Subversion over SSH and Git over HTTP protocol</title>
-    </chapter>
-    <chapter id="linux-gitolite">
-        <title>Using SubGit with Gitolite system</title>
     </chapter>
     <chapter id="linux-issues">
         <title>Troubleshooting SubGit on Linux / OS X</title>
