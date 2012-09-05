@@ -214,14 +214,16 @@
         
         <sect1><title>Installation Stages</title>
         <para>To translate Subversion repository to Git and enabled synchronization, SubGit have to be installed into Subversion repository.
-        SubGit installation consists of two stages: <emphasis role="bold">configuration</emphasis> and <emphasis role="bold">installation</emphasis>.</para>
+        SubGit installation consists of three stages: <emphasis role="bold">automatic configuration detection</emphasis>, <emphasis role="bold">configuration adjustment</emphasis> and <emphasis role="bold">installation</emphasis>.</para>
+
+        <figure id="install-stages"><title>SubGit Installation Stages</title>
+        <mediaobject><imageobject><imagedata scale="80" fileref="images/install-stages.png"/></imageobject></mediaobject>
+        </figure>
+
         <para>At configuration stage SubGit detects projects and writes down mappings it has found. Then user has a chance to adjust generated
         configuration. At installation stage SubGit performs actual translation of existing Subversion revisions to Git commits and then turns instant synchronization on.
         <xref xrefstyle="select: label" linkend="install-stages"/> schematically shows SubGit installation stages. 
         </para>
-        <figure id="install-stages"><title>SubGit Installation Stages</title>
-        <mediaobject><imageobject><imagedata scale="80" fileref="images/install-stages.png"/></imageobject></mediaobject>
-        </figure>
         </sect1>
         
         <sect1><title>Setup Service Accounts</title>
@@ -230,33 +232,53 @@
         <para>It is important to plan in advance what service would be used to access Git repositories and what to work with Subversion ones. 
         Usually Subversion service is left intact and one have to configure Git service account so, that files created or modified on its behalf are readable and writable 
         by Subversion service user and vice versa.</para>
-        <para>In most convenient case the same service (Apache HTTP Server) would be used to access both Subversion and Git repositories. Apache HTTP Server user account 
-        then would be the only SubGit user (<code>www-data:www-data</code>) as shown in <xref xrefstyle="select: label" linkend="user-same"/>.</para>
+        <para>There are basically three possible cases in regards to the services and service accounts. All cases are shown in the diagrams below.</para>
         <figure id="user-same"><title>One service and single user account</title>
         <mediaobject><imageobject><imagedata scale="80" fileref="images/user-same.png"/></imageobject></mediaobject>
         </figure>
-        
-        <para>Different services may run on behalf of the same user account as in <xref xrefstyle="select: label" linkend="user-same2"/>. In this case there is still single SubGit user, <code>www-data:www-data</code>.</para>
+        <para>In the most convenient case the same service (Apache HTTP Server) would be used to access both Subversion and Git repositories. Apache HTTP Server user account 
+        then would be the only SubGit user (<code>www-data:www-data</code>) as shown in <xref xrefstyle="select: label" linkend="user-same"/>. In this case no 
+        changes are needed.</para>
 
         <figure id="user-same2"><title>Different services ran on behalf of the same user</title>
         <mediaobject><imageobject><imagedata scale="60" fileref="images/user-same2.png"/></imageobject></mediaobject>
         </figure>
+        <para>Different services may run on behalf of the same user account as in <xref xrefstyle="select: label" linkend="user-same2"/>. In this case there is still single SubGit user, <code>www-data:www-data</code>
+        and no changes have to be made.</para>
         
-        <para>When different services are used (e.g. SSH for Git and svnserve for Subversion) and are ran on behalf of different accounts, then <emphasis>all these accounts must share
-        the same primary group</emphasis>, like shown in <xref xrefstyle="select: label" linkend="users-differ"/>. Both <code>svn</code> and <code>git</code> accounts are in the same <code>svn</code> group.</para>
-
         <figure id="users-differ"><title>Different services ran on behalf of different users</title>
         <mediaobject><imageobject><imagedata scale="60" fileref="images/users-differ.png"/></imageobject></mediaobject>
         </figure>
-        
+        <para>When different services would be used (e.g. SSH for Git and svnserve for Subversion) and ran on behalf of the different service accounts, then <emphasis>all these accounts must share
+        the same primary group</emphasis>, like shown in <xref xrefstyle="select: label" linkend="users-differ"/> where both <code>svn</code> and <code>git</code> accounts are in the same <code>svn</code> group.</para>
         <para>To display and change user's primary group one may use the following commands:<literallayout><code>  $ sudo groups git
   git : git
   $ sudo usermod -g www-data git
   $ sudo groups git
   git : www-data</code></literallayout></para>
-  <note><title>Service Accounts Summary:</title>
-  <para>It is important to ensure that either all Subversion and Git repositories that are synchronized by SubGit are accessed by the same system user (e.g. www-data:www-data) OR that 
-  all accessing users share the same primary group (e.g. svn:svn and git:svn).</para></note>
+  
+        <para>Alternatively, in <xref xrefstyle="select: label" linkend="users-differ"/> scenario, each service account should belong to all other accounts primary groups in addition to its own primary group. For instance, in case of the three accounts, they would 
+        belong to the following groups:
+        <itemizedlist>
+        <listitem>service1:service1, service2, service3</listitem>
+        <listitem>service2:service2, service1, service3</listitem>
+        <listitem>service3:service3, service1, service2</listitem>
+        </itemizedlist>
+        </para>
+        <para>Following commands show how to add user to another account primary group:<literallayout><code>  $ sudo groups svn git
+  svn : svn
+  git : git
+  $ sudo usermod -G svn git
+  $ sudo usermod -G git svn
+  $ sudo groups svn git
+  svn : svn git
+  git : git svn</code></literallayout></para>
+        <note><title>Service Accounts Summary:</title>
+        <para>It is important to ensure that all Subversion and Git repositories that are synchronized by SubGit are either:
+        <itemizedlist> <listitem>accessed by the same system user (e.g. www-data:www-data)</listitem>         
+    <listitem>accessed by the users who share the same primary group (e.g. svn:<emphasis role="bold">svn</emphasis> and git:<emphasis role="bold">svn</emphasis>)</listitem>         
+    <listitem>accessed by the users who share each other primary group (e.g. svn:svn,<emphasis role="bold">git</emphasis> and git:git,<emphasis role="bold">svn</emphasis>).</listitem></itemizedlist></para>
+        </note>
         </sect1>
         
         <sect1><title>Run <code>subgit configure</code></title>
@@ -305,7 +327,6 @@ CONFIGURATION SUCCESSFUL
   <emphasis role="bold">subgit/</emphasis>           # subgit binaries, logs and temporary directory
   format
   README.txt</code></literallayout>
-        <para>Notice that SubGit binaries are installed into repository, thus moving repository around, would not affect synchronization.</para>
         </sect1>
 
         <sect1><title>Adjust configuration</title>
