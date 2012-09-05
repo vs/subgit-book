@@ -194,7 +194,7 @@
         
         <para>
         Additionally to the default rule, explicit authors mapping may be provided by SubGit configuration. Authors mapping is stored in a separate 
-        text file which is looked at <code>SVN_REPOS/conf/authors.txt</code> by default.  
+        text file which is looked at <code>SVN_REPOS/conf/authors.txt</code> by default. Mapping file is read in system default encoding.   
         <figure id="authors.txt"><title>SVN_REPOS/conf/authors.txt file</title>
         <literallayout><code>svn_user_name = Git Name &lt;name@email.com&gt;</code></literallayout></figure>
         Default authors.txt location may be changed in SubGit configuration file. 
@@ -210,11 +210,121 @@
     </chapter>
 
     <chapter id="installation">
-        <title>SubGit Configuration and Installation</title>
+        <title>Installing SubGit into Repository</title>
+        
+        <sect1><title>Installation Stages</title>
+        <para>To translate Subversion repository to Git and enabled synchronization, SubGit have to be installed into Subversion repository.
+        SubGit installation consists of two stages: <emphasis role="bold">configuration</emphasis> and <emphasis role="bold">installation</emphasis>.</para>
+        <para>At configuration stage SubGit detects projects and writes down mappings it has found. Then user has a chance to adjust generated
+        configuration. At installation stage SubGit performs actual translation of existing Subversion revisions to Git commits and then turns instant synchronization on.
+        <xref xrefstyle="select: label" linkend="install-stages"/> schematically shows SubGit installation stages. 
+        </para>
+        <figure id="install-stages"><title>SubGit Installation Stages</title>
+        <mediaobject><imageobject><imagedata scale="80" fileref="images/install-stages.png"/></imageobject></mediaobject>
+        </figure>
+        </sect1>
+        
+        <sect1><title>Setup Service Accounts</title>
+        <note><para>This section is only relevant for Linux and OS X users.</para></note>
+        
+        <para>It is important to plan in advance what service would be used to access Git repositories and what to work with Subversion ones. 
+        Usually Subversion service is left intact and one have to configure Git service account so, that files created or modified on its behalf are readable and writable 
+        by Subversion service user and vice versa.</para>
+        <para>In most convenient case the same service (Apache HTTP Server) would be used to access both Subversion and Git repositories. Apache HTTP Server user account 
+        then would be the only SubGit user (<code>www-data:www-data</code>) as shown in <xref xrefstyle="select: label" linkend="user-same"/>.</para>
+        <figure id="user-same"><title>One service and single user account</title>
+        <mediaobject><imageobject><imagedata scale="80" fileref="images/user-same.png"/></imageobject></mediaobject>
+        </figure>
+        
+        <para>Different services may run on behalf of the same user account as in <xref xrefstyle="select: label" linkend="user-same2"/>. In this case there is still single SubGit user, <code>www-data:www-data</code>.</para>
+
+        <figure id="user-same2"><title>Different services ran on behalf of the same user</title>
+        <mediaobject><imageobject><imagedata scale="60" fileref="images/user-same2.png"/></imageobject></mediaobject>
+        </figure>
+        
+        <para>When different services are used (e.g. SSH for Git and svnserve for Subversion) and are ran on behalf of different accounts, then <emphasis>all these accounts must share
+        the same primary group</emphasis>, like shown in <xref xrefstyle="select: label" linkend="users-differ"/>. Both <code>svn</code> and <code>git</code> accounts are in the same <code>svn</code> group.</para>
+
+        <figure id="users-differ"><title>Different services ran on behalf of different users</title>
+        <mediaobject><imageobject><imagedata scale="60" fileref="images/users-differ.png"/></imageobject></mediaobject>
+        </figure>
+        
+        <para>To display and change user's primary group one may use the following commands:<literallayout><code>  $ sudo groups git
+  git : git
+  $ sudo usermod -g www-data git
+  $ sudo groups git
+  git : www-data</code></literallayout></para>
+  <note><title>Service Accounts Summary:</title>
+  <para>It is important to ensure that either all Subversion and Git repositories that are synchronized by SubGit are accessed by the same system user (e.g. www-data:www-data) OR that 
+  all accessing users share the same primary group (e.g. svn:svn and git:svn).</para></note>
+        </sect1>
+        
+        <sect1><title>Run <code>subgit configure</code></title>
+        <para>To detect projects stored in Subversion repository and generate corresponding SubGit configuration, <code>configure</code> command is used.
+        When ran on a repository with a single project one will get the following output:</para>
+<literallayout><code>$ <emphasis role="bold">subgit configure svn_repository</emphasis>
+SubGit version 1.0.0 ('Miai') build #1600
+
+Detecting paths eligible for translation... done.
+Subversion to Git mapping has been configured:
+    <emphasis role="bold">&lt;root&gt; : /var/svn/svn_repository/.git</emphasis>
+
+CONFIGURATION SUCCESSFUL
+
+To complete SubGit installation do the following:
+
+1) adjust SubGit configuration file, if necessary:
+    /var/svn/svn_repository/conf/subgit.conf
+2) add custom authors mapping to the authors.txt file at:
+    /var/svn/svn_repository/conf/authors.txt
+3) run SubGit 'install' command:
+    subgit install svn_repository</code></literallayout>
+        <para>When SubGit <code>configure</code> is ran on repository with two projects, mapping will be displayed for the both detected projects:</para>
+<literallayout><code>$ <emphasis role="bold">subgit configure svn_repository</emphasis>
+SubGit version 1.0.0 ('Miai') build #1600
+
+Detecting paths eligible for translation... done.
+Subversion to Git mapping has been configured:
+    <emphasis role="bold">/project1 : /var/svn/svn_repository/git/project1.git</emphasis>
+    <emphasis role="bold">/project2 : /var/svn/svn_repository/git/project2.git</emphasis>
+
+CONFIGURATION SUCCESSFUL
+...</code></literallayout>
+        <para>At configuration stage SubGit does not actually create Git repositories, but generates configuration file with the information on detected projects
+        and mappings. Changes to Subversion repository made by the <code>configure</code> command are shown below:</para>
+<literallayout><code>svn_repository/
+  conf/
+      <emphasis role="bold">authors.txt</emphasis>   # default authors mapping (empty)
+      authz
+      passwd
+      <emphasis role="bold">subgit.conf</emphasis>   # projects mapping and general options
+      svnserve.conf
+  db/
+  hooks/
+  locks/
+  <emphasis role="bold">subgit/</emphasis>           # subgit binaries, logs and temporary directory
+  format
+  README.txt</code></literallayout>
+        <para>Notice that SubGit binaries are installed into repository, thus moving repository around, would not affect synchronization.</para>
+        </sect1>
+
+        <sect1><title>Adjust configuration</title>
+        </sect1>
+        
+        <sect1><title>Run <code>subgit install</code></title>
+        </sect1>
     </chapter>
 
-    <chapter id="installation">
+    <chapter id="modify">
         <title>Changing SubGit Configuration</title>
+    </chapter>
+
+    <chapter id="backup">
+        <title>Backup</title>
+    </chapter>
+
+    <chapter id="recovery">
+        <title>Error Recovery</title>
     </chapter>
 
     <chapter id="reference">
