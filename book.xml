@@ -249,16 +249,10 @@
         <figure id="users-differ"><title>Different services ran on behalf of different users</title>
         <mediaobject><imageobject><imagedata scale="60" fileref="images/users-differ.png"/></imageobject></mediaobject>
         </figure>
-        <para>When different services would be used (e.g. SSH for Git and svnserve for Subversion) and ran on behalf of the different service accounts, then <emphasis>all these accounts must share
-        the same primary group</emphasis>, like shown in <xref xrefstyle="select: label" linkend="users-differ"/> where both <code>svn</code> and <code>git</code> accounts are in the same <code>svn</code> group.</para>
-        <para>To display and change user's primary group one may use the following commands:<literallayout><code>  $ sudo groups git
-  git : git
-  $ sudo usermod -g www-data git
-  $ sudo groups git
-  git : www-data</code></literallayout></para>
-  
-        <para>Alternatively, in <xref xrefstyle="select: label" linkend="users-differ"/> scenario, each service account should belong to all other accounts primary groups in addition to its own primary group. For instance, in case of the three accounts, they would 
-        belong to the following groups:
+        <para>When different services would be used (e.g. SSH for Git and svnserve for Subversion) and ran on behalf of the different service accounts, then <emphasis>each service account must 
+        belong to all other accounts primary groups in addition to its own primary group</emphasis>, like it is shown in <xref xrefstyle="select: label" linkend="users-differ"/> where 
+        <code>svn:svn</code> user also belongs to the <code>git</code> group and <code>git:git</code> user also belongs to the <code>svn</code> group.</para>
+        <para>For instance, in case of the three accounts, they would belong to the following groups:
         <itemizedlist>
         <listitem>service1:service1, service2, service3</listitem>
         <listitem>service2:service2, service1, service3</listitem>
@@ -273,11 +267,21 @@
   $ sudo groups svn git
   svn : svn git
   git : git svn</code></literallayout></para>
+  
+        <para>Alternatively, in <xref xrefstyle="select: label" linkend="users-differ"/> scenario all accounts may share the same primary group.</para>
+        <para>To display and change user's primary group one may use the following commands:<literallayout><code>  $ sudo groups git svn
+  git : git
+  svn :svn
+  $ sudo usermod -g svn git
+  $ sudo groups git svn
+  git : svn
+  svn : svn</code></literallayout></para>
+  
         <note><title>Service Accounts Summary:</title>
         <para>It is important to ensure that all Subversion and Git repositories that are synchronized by SubGit are either:
         <itemizedlist> <listitem>accessed by the same system user (e.g. www-data:www-data)</listitem>         
-    <listitem>accessed by the users who share the same primary group (e.g. svn:<emphasis role="bold">svn</emphasis> and git:<emphasis role="bold">svn</emphasis>)</listitem>         
-    <listitem>accessed by the users who share each other primary group (e.g. svn:svn,<emphasis role="bold">git</emphasis> and git:git,<emphasis role="bold">svn</emphasis>).</listitem></itemizedlist></para>
+    <listitem>accessed by the users who share each other primary group (e.g. svn:svn,<emphasis role="bold">git</emphasis> and git:git,<emphasis role="bold">svn</emphasis>)</listitem>
+    <listitem>accessed by the users who share the same primary group (e.g. svn:<emphasis role="bold">svn</emphasis> and git:<emphasis role="bold">svn</emphasis>).</listitem></itemizedlist></para>         
         </note>
         </sect1>
         
