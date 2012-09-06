@@ -78,7 +78,7 @@
         </para>
         </note>
 
-        <sect1><title>Projects mapping</title>
+        <sect1 id="projects-mapping"><title>Projects mapping</title>
         <para>  
         Subversion repository may contain one or more projects. Project is a location (folder) in Subversion repository which follows Subversion recommended repository
         layout, i.e. project folder has <emphasis>trunk</emphasis>, <emphasis>branches</emphasis> and <emphasis>tags</emphasis> subfolders:
@@ -122,7 +122,7 @@
         </figure>
         </para></sect1>
 
-        <sect1><title>Branches and Tags mapping</title>
+        <sect1 id="branches-mapping"><title>Branches and Tags mapping</title>
         <para>
         For each project mapped to a Git repository, branches and tags are mapped to the corresponding references in the Git repository.
         SubGit distinguishes the following folders in Subversion project as branches or tags:
@@ -184,7 +184,7 @@
         </para>
         </sect1>
         
-        <sect1><title>Authors Mapping</title>
+        <sect1 id="authors-mapping"><title>Authors Mapping</title>
         <para>By default there is no explicit authors mapping and the following rules are used for translation:
         <itemizedlist>
         <listitem>Subversion "<code>svn_user_name</code>" is translated to "<code>svn_user_name &lt;&gt;</code>" in Git</listitem>
@@ -226,7 +226,7 @@
         </para>
         </sect1>
         
-        <sect1><title>Setup Service Accounts</title>
+        <sect1 id="setup-service-accounts"><title>Setup Service Accounts</title>
         <note><para>This section is only relevant for Linux and OS X users.</para></note>
         
         <para>It is important to plan in advance what service would be used to access Git repositories and what to work with Subversion ones. 
@@ -282,13 +282,16 @@
         <itemizedlist> <listitem>accessed by the same system user (e.g. www-data:www-data)</listitem>         
     <listitem>accessed by the users who share each other primary group (e.g. svn:svn,<emphasis role="bold">git</emphasis> and git:git,<emphasis role="bold">svn</emphasis>)</listitem>
     <listitem>accessed by the users who share the same primary group (e.g. svn:<emphasis role="bold">svn</emphasis> and git:<emphasis role="bold">svn</emphasis>).</listitem></itemizedlist></para>         
+        SubGit configuration that involves multiple user accounts is referred later in this guide as <emphasis role="bold">shared</emphasis>.  
         </note>
         </sect1>
         
         <sect1><title>Run <code>subgit configure</code></title>
         <para>To detect projects stored in Subversion repository and generate corresponding SubGit configuration, <code>configure</code> command is used.
-        When ran on a repository with a single project one will get the following output:</para>
-<literallayout><code>$ <emphasis role="bold">subgit configure svn_repository</emphasis>
+        One must to run <code>configure</code> command on behalf of the same user account that would be used to access Subversion or Git repository. Use
+        <code>sudo</code> command on Linux or OS X or Administrator account on Windows if necessary. Examples below assume Linux.</para> 
+        <para>When <code>configure</code> command is ran on a repository with a single project one will get the following output:</para>
+<literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
 SubGit version 1.0.0 ('Miai') build #1600
 
 Detecting paths eligible for translation... done.
@@ -306,7 +309,7 @@ To complete SubGit installation do the following:
 3) run SubGit 'install' command:
     subgit install svn_repository</code></literallayout>
         <para>When SubGit <code>configure</code> is ran on repository with two projects, mapping will be displayed for the both detected projects:</para>
-<literallayout><code>$ <emphasis role="bold">subgit configure svn_repository</emphasis>
+<literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
 SubGit version 1.0.0 ('Miai') build #1600
 
 Detecting paths eligible for translation... done.
@@ -334,6 +337,118 @@ CONFIGURATION SUCCESSFUL
         </sect1>
 
         <sect1><title>Adjust configuration</title>
+        <para>SubGit <code>configure</code> command detects projects in Subversion repository and writes configuration and mappings to the <code>SVN_REPOS/conf/subgit.conf</code> file. 
+        Generated configuration have to be adjusted or extended when:
+        <itemizedlist>
+        <listitem>different user accounts will be used to access Subversion and Git repositories (see <xref xrefstyle="select: label" linkend="setup-service-accounts"/>);</listitem>
+        <listitem>project in Subversion repository was not detected by <code>subgit configure</code> command.</listitem>
+        </itemizedlist>
+        <code>subgit.conf</code> file generated for a single-project Subversion repository will look like this (some of the less frequently used options are not shown here):   
+        </para>
+        <literallayout><code>[core]
+    shared = false
+    authorsFile = conf/authors.txt
+
+[git "default"]
+
+    translationRoot = /
+    repository = .git
+    pathEncoding = UTF-8
+
+    trunk = trunk:refs/heads/master
+    branches = branches/*:refs/heads/*
+    shelves = shelves/*:refs/shelves/*
+    tags = tags/*:refs/tags/*
+    
+    minimalRevision = 0</code></literallayout>
+        <note><title>Paths in <code>subgit.conf</code> file:</title><para>File system paths in <code>subgit.conf</code> file could be specified in relative or absolute form. Relative paths are those
+        that do not start with '/' or drive letter on Windows OS. Relative paths are treated as relative to the Subversion repository root directory.</para></note>
+        <formalpara><title>Enable shared access:</title>
+        <para>
+        <literallayout><code>[core]
+    shared = <emphasis role="bold">true</emphasis></code></literallayout>
+        Set <code>core.shared</code> option to <code>true</code> (default is <code>false</code>) if you plan Subversion and Git repositories to be accessed 
+        by different user accounts (see <xref xrefstyle="select: label" linkend="setup-service-accounts"/>).</para>
+        </formalpara>
+
+        <formalpara><title>Specify explicit authors mapping file:</title>
+        <para>
+        <literallayout><code>[core]
+    ...
+    authorsFile = <emphasis role="bold">conf/company-authors-mapping.txt</emphasis></code></literallayout>
+        Specify path to the authors mapping file (see <xref xrefstyle="select: label" linkend="authors-mapping"/>) as <code>core.authorsFile</code> option value. 
+        Path is either relative to the Subversion repository root (e.g. conf/authors.txt expands to SVN_REPOS/conf/authors.txt) or absolute.</para>
+        </formalpara>
+
+        <formalpara><title>Adjust Git repository location:</title>
+        <para>
+        <literallayout><code>[git "default"]
+    ... 
+    repository = <emphasis role="bold">/var/git/project.git</emphasis></code></literallayout>
+        Specify path whether you would like Git repository to be created. By default, Git repositories are created within Subversion repository, at <code>SVN_REPOS/.git</code> in
+        a single-project repository and at <code>SVN_REPOS/git/project.git</code> in a multi-project repository. This way allows one to  copy or move Subversion and connected Git 
+        repositories with a single filesystem command. Change Git repository path to the one which fits your environment better.</para>
+        </formalpara>
+
+        <formalpara><title>Set path encoding to be used in Git repository:</title>
+        <para>
+        <literallayout><code>[git "default"]
+    ...
+    pathEncoding = <emphasis role="bold">UTF-8</emphasis></code></literallayout>
+        Git stores paths as a sequence of bytes, without enconding specified. Usually paths ends up in Git as-is, i.e. in the local file system enconding.
+        Use <code>git.pathEncoding</code> option to specify encoding to use when translating string path found in Subversion repository to Git. 
+        Most modern file systems use or could be configured to use UTF-8 encoding and this is default and recommended value.</para>
+        </formalpara>
+
+        <formalpara><title>Set revision to start translation from:</title>
+        <para>
+        <literallayout><code>[git "default"]
+    ...
+    minimalRevision = <emphasis role="bold">1024</emphasis></code></literallayout>
+        Set <code>git.minimalRevision</code> to Subversion revision from which translation should be started. Revisions older than specified 
+        would not be translated and would not be present in the Git repository. Limiting range of revisions with this option may reduce initial
+        translation time.</para>
+        </formalpara>
+
+        <formalpara><title>Add projects that have not being detected automatically:</title>
+        <para><literallayout></literallayout>Some projects with non-standard layout may not be detected by SubGit (see <xref linkend="projects-mapping"/> and <xref linkend="branches-mapping"/>). In case it is possible 
+        to distinguish trunk, branches and tags directories for those projects one may add them manually to the configuration file.</para>
+        <para>Consider the following layout for <code>project</code> and <code>library</code> project:
+        <literallayout><code>trunk/
+    project/
+    library/        
+branches/
+    project/
+    library/
+tags/
+    project/
+    library/</code></literallayout>
+    Corresponding <code>[git]</code> sections should be added to <code>subgit.conf</code> file to enable translation 
+    and synchronizations of these projects:
+        <literallayout><code>[git "project"]
+    repository = /var/git/project.git
+    
+    translationRoot = /
+
+    trunk = trunk/project:refs/heads/master
+    branches = branches/project:refs/heads/*
+    shelves = shelves/project:refs/shelves/*
+    tags = tags/project:refs/tags/*
+    
+[git "library"]
+    repository = /var/git/library.git
+    
+    translationRoot = /
+
+    trunk = trunk/library:refs/heads/master
+    branches = branches/library:refs/heads/*
+    shelves = shelves/library:refs/shelves/*
+    tags = tags/library:refs/tags/*</code></literallayout>
+    Note that <code>git.translationRoot</code> options have similar value in both projects. This option specify a path
+    relative to which branches and tags mapping paths are expanded. 
+        </para>
+        </formalpara>
+
         </sect1>
         
         <sect1><title>Run <code>subgit install</code></title>
