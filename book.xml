@@ -364,7 +364,7 @@ CONFIGURATION SUCCESSFUL
     minimalRevision = 0</code></literallayout>
         <note><title>Paths in <code>subgit.conf</code> file:</title><para>File system paths in <code>subgit.conf</code> file could be specified in relative or absolute form. Relative paths are those
         that do not start with '/' or drive letter on Windows OS. Relative paths are treated as relative to the Subversion repository root directory.</para></note>
-        <formalpara><title>Enable shared access:</title>
+        <formalpara id="enable-shared-access"><title>Enable shared access:</title>
         <para>
         <literallayout><code>[core]
     shared = <emphasis role="bold">true</emphasis></code></literallayout>
@@ -456,6 +456,8 @@ tags/
     relative to which branches and tags mapping paths are expanded. 
         </para>
         </formalpara>
+        <para>One will find more options in the <code>conf/subgit.conf</code> file, as well as documentation 
+        on what these options control.</para>
 
         </sect1>
         
@@ -706,8 +708,18 @@ sSPIOdt1sz1@6d6PXEzybYJq1DOaZfXWzogM3jpB4M1hBA1LRJBbOE1qVWH</code></literallayou
 
         <formalpara><title>Register SubGit:</title>
         <literallayout/>Run <code>subgit register</code> command to register repository. This command have to 
-        be ran on behalf of the root user on Linux or OS X or as Adminstrator on Windows; super user privileges
-        are needed to store key securely.   
+        be ran on behalf of the user who has write access to the <code>/etc</code> directory on Linux or OS X or to the system
+        APP_DATA directory on Windows. This usually would be <code>root</code> user on Linux and OS X and user with Administrator 
+        priviledges on Windows.</formalpara>
+        <para>   
+        Unless key file location is specified on the command line with the <code>--key</code> option, SubGit
+        looks for the key file at the following locations:
+        <itemizedlist>
+        <listitem><code>SVN_REPOSITORY/subgit/subgit.key</code></listitem>
+        <listitem><code>USER_HOME/.subgit/subgit.key</code></listitem>
+        </itemizedlist>
+        SubGit <code>register</code> command provides some information on the key limits and on how 
+        many repositories could be registered with it:
 <literallayout><code>$ sudo <emphasis role="bold">subgit register --key subgit.key svn_repository</emphasis>
 SubGit version 1.0.0 ('Miai') build #1600
 
@@ -719,7 +731,7 @@ Registration information:
 
     This key has been used to register 1 repository; You may use this key to register 9 more repositories (out of 10).
 
-REGISTRATION SUCCESSFUL</code></literallayout></formalpara>
+REGISTRATION SUCCESSFUL</code></literallayout></para>
     </chapter>
 
     <chapter id="backup">
@@ -728,10 +740,82 @@ REGISTRATION SUCCESSFUL</code></literallayout></formalpara>
 
     <chapter id="recovery">
         <title>Error Recovery</title>
+        <para>SubGit is very stable, but as with any application working in complex environment, errors may happen due to various reasons, like
+        unexpected server shutdown, out of memory condition, process being killed, etc. 
+        In case of SubGit errors could be localized to the translation failure, either from Subversion to Git or in the opposite directory.        
+        </para>
+        <para>SubGig has built in error handling mechanism and offers error recovery procedures. The way potential translation failures are handled is
+        controlled by the <code>core.failSafe</code> configuration option in the <code>conf/subgit.conf</code> file:
+        <literallayout><code>[core]
+        ..
+        failSafe = <emphasis role="bold">auto</emphasis>|svn|git</code></literallayout>
+        Default <code>core.failSafe</code> option value is <code><emphasis role="bold">auto</emphasis></code>.  
+        </para>
+        <formalpara><title>Auto mode:</title><literallayout/>
+        In the auto mode, failed translation results in commits or pushes to be blocked on the side to which translation has failed. This allows
+        history of Subversion and Git repositories not to diverge and synchronization to be restored later.
+        <figure id="svn-to-git-fail-auto"><title>Auto mode: Subversion to Git translation fails.</title>
+           <mediaobject><imageobject><imagedata scale="80" fileref="images/svn2git-fail-auto.png"/></imageobject></mediaobject>
+        </figure>
+        <figure id="git-to-svn-fail-auto"><title>Auto mode: Git to Subversion translation fails.</title>
+           <mediaobject><imageobject><imagedata scale="80" fileref="images/git2svn-fail-auto.png"/></imageobject></mediaobject>
+        </figure>
+        Users who will attempt to push or to commit changes via the side that is blocked, will not succeed and will receive an error 
+        message (for the case Git side is blocked as in <xref linkend="svn-to-git-fail-auto" xrefstyle="select: label"/>):
+        <literallayout><code>  WARNING:
+      descriptive error message
+  CURRENT STATE:
+      Subversion: READ AND WRITE
+      Git       : READ ONLY
+  TO RECOVER:
+      Run on the server:
+         <emphasis role="bold">subgit install /var/svn/repos</emphasis></code></literallayout>
+        
+        As it is said, to recover run <code>subgit install svn_repository</code> on the server side. It will translate not yet translated 
+        commits or revisions and will enable synchronization back.
+        </formalpara>
+        <para>Depending on the error message and on whether translation failures persist, it makes sense to check if there are 
+        something in the environment that causes those issues. Common reasons are:
+        <itemizedlist>
+        <listitem>Service accounts misconfiguration (see <xref linkend="setup-service-accounts"/>)</listitem>
+        <listitem>Multiple accounts being used, but SubGit <code>core.shared</code> option is set to <code>false</code> (see <xref linkend="enable-shared-access"/>)</listitem>
+        <listitem>Insufficient amount of memory available for the translation process</listitem>
+        </itemizedlist>
+        In case fixing the reason of the problem requires changing SubGit configuration, then change configuration first and 
+        run <code>subgit install</code> to restore synchronization when all necessary configuration options are set.</para> 
+        <formalpara><title>Svn or Git mode:</title><literallayout/>
+        Sometimes it is desirable to always keep certain (either Subversion or Git) side unblocked, even when translation
+        to that side have failed:
+        <literallayout><code>[core]
+    # commits to Subversion are never blocked:
+    failSafe = <emphasis role="bold">svn</emphasis></code></literallayout>
+    Or:
+        <literallayout><code>[core]
+    # pushes to Git are never blocked:
+    failSafe = <emphasis role="bold">git</emphasis></code></literallayout>
+    
+    Followig <code>git</code> or <code>svn</code> translation failure handling policy may naturally result in Subversion and
+    Git histories to diverge (commit "c2" and revision "r2" represent diverged history on both figures):
+        <figure id="git-to-svn-fail-svn"><title>History diverges in the <code>svn</code> mode</title>
+           <mediaobject><imageobject><imagedata scale="80" fileref="images/git2svn-fail-svn.png"/></imageobject></mediaobject>
+        </figure>
+        <figure id="svn-to-git-fail-git"><title>History diverges in the <code>git</code> mode</title>
+           <mediaobject><imageobject><imagedata scale="80" fileref="images/svn2git-fail-git.png"/></imageobject></mediaobject>
+        </figure>
+    Compare above with how SubGit handles translation failures in the <code>auto</code> mode (<xref xrefstyle="select: label" linkend="svn-to-git-fail-auto"/> and <xref xrefstyle="select: label" linkend="git-to-svn-fail-auto"/>).
+    To recover from the case when history in Git and Subversion repositories had diverged, multi-step recovery procedure is required:
+    <literallayout>   <emphasis role="bold">1) Rebase diverged Git commits</emphasis></literallayout> 
+    <literallayout>   <emphasis role="bold">2) Uninstall Subgit (in <code>svn</code> mode only)</emphasis></literallayout> 
+    <literallayout>   <emphasis role="bold">3) Push rebased Git history</emphasis></literallayout> 
+    <literallayout>   <emphasis role="bold">4) Reinstall SubGit</emphasis></literallayout> 
+        </formalpara>
     </chapter>
 
     <chapter id="reference">
         <title>SubGit Reference</title>
+        <sect1>
+        <title>SubGit System Requirements</title>
+        </sect1>
         <sect1>
         <title>SubGit Files</title>
         </sect1>
