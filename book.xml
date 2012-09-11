@@ -807,15 +807,52 @@ REGISTRATION SUCCESSFUL</code></literallayout></para>
     <literallayout>   <emphasis role="bold">1) Rebase diverged Git commits</emphasis></literallayout> 
     <literallayout>   <emphasis role="bold">2) Uninstall Subgit (in <code>svn</code> mode only)</emphasis></literallayout> 
     <literallayout>   <emphasis role="bold">3) Push rebased Git history</emphasis></literallayout> 
-    <literallayout>   <emphasis role="bold">4) Reinstall SubGit</emphasis></literallayout> 
+    <literallayout>   <emphasis role="bold">4) Reinstall SubGit</emphasis></literallayout>
+    Recover procedure will rebase diverged Git commits on to a special branch; then untranslated Subversion revisions will be translated 
+    to the original branch. Users then could merge rebased changes back to the original branch if necessary.
+        <figure id="recovered-branch"><title>Diverged history being recovered</title>
+           <mediaobject><imageobject><imagedata scale="80" fileref="images/recovered-branch.png"/></imageobject></mediaobject>
+        </figure>
+    
         </formalpara>
+    </chapter>
+
+    <chapter id="system-requirements">
+        <title>System Requirements</title>
+        <para>SubGit will run on the most modern systems. Requirements for the server are:
+        <itemizedlist>
+            <listitem>Windows XP or newer, Linux or OS X</listitem>
+            <listitem>Oracle Java 1.5 or newer</listitem>
+            <listitem>At least 256Mb*K + 32Mb*N of RAM, where N is the maximum number of concurrent commits or pushes, 
+            and K is the number of Subversion repositories.</listitem>
+        </itemizedlist>
+        </para>
+        <para>
+        At any single moment SubGit would run no more than N + 1 Java processes per repository, where N is a number of concurrent commits or pushes at that very moment.
+        N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</para>
+        <para>Each of the N Java processes (hooks) is ran with the following options by default:
+        <literallayout><code>  java -noverify -Xint -Djava.awt.headless=true</code></literallayout>
+        Background translation process default options are:
+        <literallayout><code>  java -noverify -client -Djava.awt.headless=true</code></literallayout>
+        These options could be changed in the <code>conf/subgit.conf</code> file. For instance:
+        <literallayout><code>[hooks]
+    javaOptions = -noverify -Djava.awt.headless=true
+     
+[daemon]
+    javaOptions = -noverify -server -Djava.awt.headless=true</code></literallayout>
+        
+        By default background translation process exits as soon as translation is over, but an idle timeout
+        could be specified to let it run for longer time or to exit never. This may increase overall performance in case of the heavy commits or pushes traffic.  
+        <literallayout><code>[daemon]
+    idleTimeout = 0|N|infinity</code></literallayout>
+    Default timeout is 0, i.e. background translation process exits as soon as translation is over and there are no more revisions or commits to translate.
+    Timeout value is speicified in seconds and <code>infinity</code> value means that process should never exit.
+        </para>
+        <para>Run <code>subgit install</code> after changing <code>conf/subgit.conf</code> file for the changs to become effective.</para>
     </chapter>
 
     <chapter id="reference">
         <title>SubGit Reference</title>
-        <sect1>
-        <title>SubGit System Requirements</title>
-        </sect1>
         <sect1>
         <title>SubGit Files</title>
         </sect1>
