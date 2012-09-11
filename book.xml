@@ -12,10 +12,6 @@
             <para>This work is licensed under a <link xl:href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</link>.
             </para>
         </legalnotice>
-        <author>
-            <firstname>Alexander</firstname>
-            <surname>Kitaev</surname>
-        </author>
     </bookinfo>   
 
     
@@ -736,6 +732,41 @@ REGISTRATION SUCCESSFUL</code></literallayout></para>
 
     <chapter id="backup">
         <title>Backup</title>
+        <para>SubGit as of version 1.0 does not provide integrated backup solution. Standard Subversion and Git tools should be 
+        used to back up repositories.</para>
+        <formalpara><title>Backup Subversion repository only:</title><literallayout></literallayout>
+        Back up Subversion repository with <code>svnadmin</code> tool. Plus back up <code>conf/subgit.conf</code> and 
+        authors mapping (<code>conf/author.txt</code>) files.        
+        <literallayout><code>$ svnadmin dump /var/svn/repos &gt; repos.dump
+$ cp /var/svn/repos/conf/subgit.conf subgit.conf.backup
+$ cp /var/svn/repos/conf/authors.txt authors.txt.backup</code></literallayout>
+        Restore repository from dump when necessary and reinstall SubGit (see) into restored repository, with 
+        the old configuration and authors mapping.  
+        <literallayout><code>$ svnadmin load /var/svn/repos &lt; repos.dump
+$ subgit configure /var/svn/repos
+$ cp subgit.conf.backup /var/svn/repos/conf/subgit.conf
+$ cp authors.txt.backup /var/svn/repos/conf/authors.txt
+$ subgit install /var/svn/repos</code></literallayout>
+        Git users will have to clone Git repositories again, as newly created Git repositories will contain commit with different hash IDs than before. 
+        Make sure to run all commands on behalf of the user who runs Git or Subversion service (see <xref linkend="setup-service-accounts"/>).
+        </formalpara>
+
+        <formalpara><title>Backup all:</title><literallayout></literallayout>
+        Sometimes it might  be more convenient to backup Subversion repository along with Git repositories
+        and SubGit metada. First, disable Git pushes and then disable SubGit synchronization (single Git 
+        repository is assumed):
+        <literallayout><code>$ echo '#!/bin/sh\nexit 1' > /var/svn/repos/.git/hooks/user-pre-receive
+$ subgit uninstall /var/svn/repos</code></literallayout>
+        Then back up everything, reinstall SubGit and enable synchronization back:
+<literallayout><code>$ svnadmin hotcopy /var/svn/repos repos.backup
+$ subgit install /var/svn/repos
+$ rm /var/svn/repos/.git/hoooks/user-pre-receive</code></literallayout>
+        Similary restore Subversion repository along with the Git one and SubGit metadata:
+        <literallayout><code>$ svnadmin hotcopy repos.backup /var/svn/repos 
+$ subgit install /var/svn/repos
+$ rm /var/svn/repos/.git/hoooks/user-pre-receive</code></literallayout> 
+        Make sure to run all commands on behalf of the user who runs Git or Subversion service (see <xref linkend="setup-service-accounts"/>).
+        </formalpara>
     </chapter>
 
     <chapter id="recovery">
@@ -846,22 +877,9 @@ REGISTRATION SUCCESSFUL</code></literallayout></para>
         <literallayout><code>[daemon]
     idleTimeout = 0|N|infinity</code></literallayout>
     Default timeout is 0, i.e. background translation process exits as soon as translation is over and there are no more revisions or commits to translate.
-    Timeout value is speicified in seconds and <code>infinity</code> value means that process should never exit.
+    Timeout value is specified in seconds and <code>infinity</code> value means that process should never exit.
         </para>
         <para>Run <code>subgit install</code> after changing <code>conf/subgit.conf</code> file for the changs to become effective.</para>
-    </chapter>
-
-    <chapter id="reference">
-        <title>SubGit Reference</title>
-        <sect1>
-        <title>SubGit Files</title>
-        </sect1>
-        <sect1>
-        <title>Configuration Options</title>
-        </sect1>
-        <sect1>
-        <title>Command Line Reference</title>
-        </sect1>
     </chapter>
 
     <chapter id="linux-apache">
