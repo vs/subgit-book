@@ -730,6 +730,35 @@ Registration information:
 REGISTRATION SUCCESSFUL</code></literallayout></para>
     </chapter>
 
+    <chapter id="limitations">
+        <title>Translation Limitations</title>
+        <para>Subversion and Git version control systems solves the same problem, that is why Subversion and Git repositories
+        synchronization is possible. However, Subversion and Git implementation differs and that is why there are number of
+        entities in both VCS worlds that are not translated. Still these entities are fully functional for that VCS users, for 
+        instance while empty directories are not translated from Subversion to Git, Subversion users may use them and create
+        as many as they would like.</para>
+        <para>The following entities are not translated from <emphasis role="bold">Subversion to Git</emphasis>:
+        <itemizedlist>
+        <listitem>Arbitrary user defined properties</listitem>
+        <listitem>Revision properties</listitem>
+        <listitem><code>svn:externals</code> properties</listitem>
+        <listitem>Empty directories</listitem>
+        <listitem>File locks</listitem>
+        <listitem>Merge tracking information for cherry-pick merges</listitem>
+        <listitem>Subversion path-based authentication is not taken into account for Git users</listitem>
+        </itemizedlist>
+        </para>
+        
+        <para>The following entities are not translated from <emphasis role="bold">Git to Subversion</emphasis>:
+        <itemizedlist>
+        <listitem>Git submodules</listitem>
+        <listitem>Git notes</listitem>
+        <listitem>Irrelevant file attributes</listitem>
+        </itemizedlist>
+        Future versions of SubGit will remove some of the above limitations.
+        </para>
+    </chapter>
+
     <chapter id="backup">
         <title>Backup</title>
         <para>SubGit as of version 1.0 does not provide integrated backup solution. Standard Subversion and Git tools should be 
