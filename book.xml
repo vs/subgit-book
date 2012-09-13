@@ -968,13 +968,15 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         <itemizedlist>
             <listitem>Windows XP or newer, Linux or OS X</listitem>
             <listitem>Oracle Java 1.5 or newer</listitem>
-            <listitem>At least 256Mb*K + 32Mb*N of RAM, where N is the maximum number of concurrent commits or pushes, 
+            <listitem>At least 256Mb*K + 32Mb*N of memory available, where N is the maximum number of concurrent commits or pushes, 
             and K is the number of Subversion repositories.</listitem>
         </itemizedlist>
+        Memory available consists of physical memory and swap, so memory requirement gives an idea of how much memory might be allocated
+        by SubGit at peak time, it does not mean that server must have that much physical memory installed.
         </para>
-        <para>
+        <formalpara><title>On SubGit processes:</title><literallayout/>
         At any single moment SubGit would run no more than N + 1 Java processes per repository, where N is a number of concurrent commits or pushes at that very moment.
-        N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</para>
+        N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</formalpara>
         <para>Each of the N Java processes (hooks) is ran with the following options by default:
         <literallayout><code>  java -noverify -Xint -Djava.awt.headless=true</code></literallayout>
         Background translation process default options are:
@@ -995,28 +997,111 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         </para>
         <para>Run <code>subgit install</code> after changing <code>conf/subgit.conf</code> file for the changs to become effective.</para>
     </chapter>
+    
+    <chapter id="os-installation"><title>Installing SubGit Tool</title>
+    <para>Before install SubGit into Subversion repository, <code>subgit</code> tool itself has to be installed on your server.
+    Make sure your server meets SubGit system requirements (see <xref linkend="system-requirements" xrefstyle="select: label"/>) and follow instructions below on how to install SubGit tool.</para>
+    <formalpara><title>On Debian-based or Ubuntu OS:</title>
+    <itemizedlist>
+    <listitem>Download SubGit <emphasis role="bold">debian package</emphasis> file from SubGit <ulink url="http://subgit.com/download">download page</ulink>;</listitem>
+    <listitem>Run <code>sudo dpkg -i subgit.deb</code> to install SubGit;</listitem>
+    <listitem>Run <code>sudo apt-get install -f</code> to install missing dependencies, if there are any.</listitem>
+    </itemizedlist>
+    Now you may run <code>subgit</code> command from the command line. Test it by running <code>subgit --version</code> command. To upgrade SubGit tool, repeat above steps with the newer debian package file.
+    </formalpara>
 
-    <chapter id="linux-apache">
-        <title>Subversion and Git over HTTP with Apache Web Server</title>
+    <formalpara><title>On Linux and OS X:</title>
+    <itemizedlist>
+    <listitem>If necessary, download and install most recent version of the Java SE JDK from the Java <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">download page</ulink>;</listitem>
+    <listitem>Download SubGit <emphasis role="bold">zip archive</emphasis> file from SubGit <ulink url="http://subgit.com/download">download page</ulink>;</listitem>
+    <listitem>Acting as the <code>root</code> user, unpack all files from SubGit archive into <code>/opt/subgit/</code> directory;</listitem>
+    <listitem>Append <code>/opt/subgit</code> to the PATH variable, e.g. in the <code>/etc/profile</code> file.</listitem>
+    </itemizedlist>
+    Now you may run <code>subgit</code> command from the command line. Test it by running <code>subgit --version</code> command. 
+    To upgrade SubGit tool, delete all files from the <code>/opt/subgit</code> directory and repeat above steps with the SubGit zip archive.
+    </formalpara>
+
+    <formalpara><title>On Windows OS:</title>
+    <itemizedlist>
+    <listitem>If necessary, download and install most recent version of the Java SE JDK from the Java <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">download page</ulink>;</listitem>
+    <listitem>Download SubGit <emphasis role="bold">zip archive</emphasis> file from SubGit <ulink url="http://subgit.com/download">download page</ulink>;</listitem>
+    <listitem>Acting as Administrator user, unpack all files from SubGit archive into <code>C:\Program Files\SubGit</code> directory;</listitem>
+    <listitem>Append <code>C:\Program Files\SubGit\bin</code> directory to the system PATH variable in the Control Panel.</listitem>
+    </itemizedlist>
+    Now you may run <code>subgit</code> command from the command line. Test it by running <code>subgit --version</code> command. 
+    To upgrade SubGit tool, delete all files from the <code>C:\Program Files\SubGit</code> directory and repeat above steps with the SubGit zip archive.
+    </formalpara>
+   
     </chapter>
-    <chapter id="linux-ssh">
+    <chapter id="common-server-configurations">
+   <title>Common Server Setups</title>
+    
+    <sect1 id="linux-apache">
+        <title>Subversion and Git over HTTP(s)</title>
+        <formalpara><title>Setup:</title><itemizedlist>
+        <listitem>Subversion repositories are located in the <code>/var/svn</code> directory</listitem>
+        <listitem>Apache web server is installed and configured to provide access to those Subversion repositories</listitem>
+        <listitem>SubGit is installed into Subversion repositories and Git repositories are located
+        within Subversion repoistories</listitem>
+        <listitem>Users access Subversion repositories at <code>http://host/svn/repositoryName</code> URLs</listitem>
+        </itemizedlist>
+        </formalpara>
+        <formalpara><title>Goal:</title>Extend Apache web server configuration to make it provide
+        access to the Git repositories.</formalpara>
+        <formalpara><title>Steps:</title><literallayout>  1) Install <ulink url="http://schacon.github.com/git/git-http-backend.html">git-http-backend</ulink> which is a part of Git 1.6.6 or newer
+        
+  2) Add Git directives to the apache configuration file (added lines are shown with bold font):
+  
+  <code> &lt;-- Password protected read and write Subversion repository access --&gt;
+  &lt;Location /svn&gt;
+    DAV svn
+    SVNParentPath "/var/svn"
+    Require valid-user
+    AuthType Basic
+    AuthUserFile "/path/to/passwd"
+  &lt;/Location&gt;
+
+  <emphasis role="bold">SetEnv GIT_PROJECT_ROOT /var/svn
+  SetEnv GIT_HTTP_EXPORT_ALL
+  ScriptAlias /git/ /usr/lib/git-core/git-http-backend/</emphasis>
+
+  &lt;-- Password protected read and write Git repository access --&gt;
+  <emphasis role="bold">&lt;Location /git&gt;
+    Require valid-user
+    AuthType Basic
+    AuthUserFile "/path/to/passwd"
+  &lt;/Location&gt;</emphasis></code>
+  
+  More configuration examples could be found at the git-http-backend <ulink url="http://schacon.github.com/git/git-http-backend.html">documentation page</ulink>. 
+  
+  3) Reload Apache configuration:
+  
+  <code> sudo /etc/init.d/apache2 reload</code></literallayout>
+        Users now may access Git repositories at <code>http://host/git/repositoryName</code> for a single-project Subversion repositories or at <code>http://host/git/repositoryName/git/project.git</code>
+        for multi-project Subversion repositories. Users should use same credentials they are using to access Subversion repository. 
+        </formalpara>
+    </sect1>
+    
+    <sect1 id="linux-ssh">
         <title>Subversion and Git over SSH protocol</title>
-    </chapter>
-    <chapter id="linux-shared">
-        <title>Subversion over SSH and Git over HTTP protocol</title>
-    </chapter>
-    <chapter id="linux-issues">
-        <title>Troubleshooting SubGit on Linux / OS X</title>
+    </sect1>
+    
+    <sect1 id="linux-shared">
+        <title>Subversion over SVN and Git over SSH protocol</title>
+    </sect1>
+    
+    <sect1 id="windows-visualsvn">
+        <title>SubGit with VisualSVN</title>
+    </sect1>
+
+    <sect1 id="windows-ubersvn">
+        <title>SubGit with WANDisco uberSVN on Windows</title>
+    </sect1>
+    
     </chapter>
     
-    <chapter id="windows">
-        <title>Installing SubGit on Windows</title>
-    </chapter>
-    <chapter id="windows-visualsvn">
-        <title>SubGit with VisualSVN</title>
-    </chapter>
-    <chapter id="windows-ubersvn">
-        <title>SubGit with WANDisco uberSVN on Windows</title>
+    <chapter id="linux-issues">
+        <title>Troubleshooting SubGit on Linux / OS X</title>
     </chapter>
     <chapter id="windows-issues">
         <title>Troubleshooting SubGit on Windows</title>
