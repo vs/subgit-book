@@ -54,6 +54,17 @@ code, pre {
 /*
  * Docbook content
  */
+.literallayout {
+
+    background-color: #fafafa;
+
+    margin-bottom: 10px;
+    padding-left:10px;
+    padding-top:18px;
+    padding-bottom:1px;
+    box-shadow:0 0 2px #333;
+
+}
 
 /*
  * Lists

@@ -415,7 +415,7 @@ dmitry = Dmitry Pavlenko (pavlenko@tmatesoft.com)</code></literallayout></para>
         </formalpara>
 
         <formalpara><title>Add projects that have not being detected automatically:</title>
-        <para><literallayout></literallayout>Some projects with non-standard layout may not be detected by SubGit (see <xref linkend="projects-mapping"/> and <xref linkend="branches-mapping"/>). In case it is possible 
+        <para><para/>Some projects with non-standard layout may not be detected by SubGit (see <xref linkend="projects-mapping"/> and <xref linkend="branches-mapping"/>). In case it is possible 
         to distinguish trunk, branches and tags directories for those projects one may add them manually to the configuration file.</para>
         <para>Consider the following layout for <code>project</code> and <code>library</code> project:
         <literallayout><code>trunk/
@@ -683,7 +683,7 @@ SubGit hooks have been removed from Subversion repository:
         During that evaluation period SubGit will remind you on a necessity of registration with the help of post commit and post receive messages.
         For production use registration is required.</para>
         <formalpara><title>Obtain registration key:</title>
-        <para><literallayout/>SubGit registration key is a file with a contents like:</para>
+        <para><para/>SubGit registration key is a file with a contents like:</para>
         <literallayout><code>Purchase ID: CM-123456 
 Name: Company &lt;company@email.com&gt;
 Committers per repository: 10
@@ -698,15 +698,15 @@ sSPIOdt1sz1@6d6PXEzybYJq1DOaZfXWzogM3jpB4M1hBA1LRJBbOE1qVWH</code></literallayou
         </formalpara>
         
         <formalpara><title>Upload key:</title>
-        <literallayout/>Upload key you have received to the server where your Subversion repository is located. 
-        You may upload the file, or copy and paste key file contents to the file on the server side. 
+        <para><para/>Upload key you have received to the server where your Subversion repository is located. 
+        You may upload the file, or copy and paste key file contents to the file on the server side.</para> 
         </formalpara>
 
         <formalpara><title>Register SubGit:</title>
-        <literallayout/>Run <code>subgit register</code> command to register repository. This command have to 
+        <para><para/>Run <code>subgit register</code> command to register repository. This command have to 
         be ran on behalf of the user who has write access to the <code>/etc</code> directory on Linux or OS X or to the system
         APP_DATA directory on Windows. This usually would be <code>root</code> user on Linux and OS X and user with Administrator 
-        priviledges on Windows.</formalpara>
+        priviledges on Windows.</para></formalpara>
         <para>   
         Unless key file location is specified on the command line with the <code>--key</code> option, SubGit
         looks for the key file at the following locations:
@@ -725,7 +725,8 @@ Registration information:
     Purchase ID:          CM-123456
     Committers Limit:     10
 
-    This key has been used to register 1 repository; You may use this key to register 9 more repositories (out of 10).
+    This key has been used to register 1 repository; 
+    You may use this key to register 9 more repositories (out of 10).
 
 REGISTRATION SUCCESSFUL</code></literallayout></para>
     </chapter>
@@ -763,7 +764,7 @@ REGISTRATION SUCCESSFUL</code></literallayout></para>
         <title>Backup</title>
         <para>SubGit as of version 1.0 does not provide integrated backup solution. Standard Subversion and Git tools should be 
         used to back up repositories.</para>
-        <formalpara><title>Backup Subversion repository only:</title><literallayout></literallayout>
+        <formalpara><title>Backup Subversion repository only:</title><para><para/>
         Back up Subversion repository with <code>svnadmin</code> tool. Plus back up <code>conf/subgit.conf</code> and 
         authors mapping (<code>conf/author.txt</code>) files.        
         <literallayout><code>$ svnadmin dump /var/svn/repos &gt; repos.dump
@@ -778,9 +779,10 @@ $ cp authors.txt.backup /var/svn/repos/conf/authors.txt
 $ subgit install /var/svn/repos</code></literallayout>
         Git users will have to clone Git repositories again, as newly created Git repositories will contain commit with different hash IDs than before. 
         Make sure to run all commands on behalf of the user who runs Git or Subversion service (see <xref linkend="setup-service-accounts"/>).
+        </para>
         </formalpara>
 
-        <formalpara><title>Backup all:</title><literallayout></literallayout>
+        <formalpara><title>Backup all:</title><para><para/>
         Sometimes it might  be more convenient to backup Subversion repository along with Git repositories
         and SubGit metada. First, disable Git pushes and then disable SubGit synchronization (single Git 
         repository is assumed):
@@ -813,6 +815,7 @@ $ subgit install /var/svn/repos
 $ rm /var/svn/repos/.git/hooks/user-pre-receive
 $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks/user-pre-receive</code></literallayout> 
         Make sure to run all commands on behalf of the user who runs Git or Subversion service (see <xref linkend="setup-service-accounts"/>).
+        </para>
         </formalpara>
     </chapter>
 
@@ -829,9 +832,9 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         failSafe = <emphasis role="bold">auto</emphasis>|svn|git</code></literallayout>
         Default <code>core.failSafe</code> option value is <code><emphasis role="bold">auto</emphasis></code>.  
         </para>
-        <formalpara><title>Auto mode:</title><literallayout/>
-        In the auto mode, failed translation results in commits or pushes to be blocked on the side to which translation has failed. This allows
-        history of Subversion and Git repositories not to diverge and synchronization to be restored later.
+        <formalpara><title>Auto mode:</title>
+        <para><para/>In the auto mode, failed translation results in commits or pushes to be blocked on the side to which translation has failed. This allows
+        history of Subversion and Git repositories not to diverge and synchronization to be restored later.</para>
         <figure id="svn-to-git-fail-auto"><title>Auto mode: Subversion to Git translation fails.</title>
            <mediaobject><imageobject><imagedata scale="80" fileref="images/svn2git-fail-auto.png"/></imageobject></mediaobject>
         </figure>
@@ -861,9 +864,9 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         </itemizedlist>
         In case fixing the reason of the problem requires changing SubGit configuration, then change configuration first and 
         run <code>subgit install</code> to restore synchronization when all necessary configuration options are set.</para> 
-        <formalpara><title>Svn or Git mode:</title><literallayout/>
+        <formalpara><title>Svn or Git mode:</title><para><para/>
         Sometimes it is desirable to always keep certain (either Subversion or Git) side unblocked, even when translation
-        to that side have failed:
+        to that side have failed:</para>
         <literallayout><code>[core]
     # commits to Subversion are never blocked:
     failSafe = <emphasis role="bold">svn</emphasis></code></literallayout>
@@ -883,20 +886,19 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     Compare above with how SubGit handles translation failures in the <code>auto</code> mode (<xref xrefstyle="select: label" linkend="svn-to-git-fail-auto"/> and <xref xrefstyle="select: label" linkend="git-to-svn-fail-auto"/>).
     To recover from the case when history in Git and Subversion repositories had diverged, multi-step recovery procedure have to
     be performed.
-    <literallayout><emphasis role="bold">For each Git repository which history diverged from Subversion do:</emphasis></literallayout>
     <para>Commands and figures below assume single project Subversion repository at <code>/var/svn/repos</code> synchronized with a single Git repository 
     at <code>/var/svn/repos/.git</code> with history diversion between Git <code>master</code> branch and Subversion <code>trunk</code>.</para>
     <figure id="recovery-diversion"><title>Diverged Subversion and Git histories on trunk and master branch</title>
        <mediaobject><imageobject><imagedata scale="60" fileref="images/recovery-diversion.png"/></imageobject></mediaobject>
     </figure>
-    <literallayout><emphasis role="bold">1) Create a backup Git repository</emphasis></literallayout>
+    <formalpara><title>1) Create a backup Git repository</title></formalpara>
     <literallayout><code>  # create clone of the original Git repository
   $ git clone /var/svn/repos repos.backup
     
   # track all remote branches on which there are untranslated commits
   $ git checkout master</code></literallayout>
      
-    <literallayout><emphasis role="bold">2) Reset Git references to the pre-diversion state</emphasis></literallayout>
+    <formalpara><title>2) Reset Git references to the pre-diversion state</title></formalpara>
     Branch and tag references to the last translated commits are stored in the <code>refs/svn/root</code> namespace
     of the original repository. Exact reference name in <code>refs/svn/root</code> depends on the branches and tags mapping
     configured for this Git repository (see <xref linkend="branches-mapping"/>). Default correspondence is:
@@ -924,7 +926,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     <figure id="recovery-reset"><title>master branch reset to the pre-diversion state</title>
        <mediaobject><imageobject><imagedata scale="60" fileref="images/recovery-reset.png"/></imageobject></mediaobject>
     </figure>
-    <literallayout><emphasis role="bold">3) Enable SubGit synchronization</emphasis></literallayout> 
+    <formalpara><title>3) Enable SubGit synchronization</title></formalpara> 
     <literallayout><code>  # reset error state and enable synchronization back
   $ subgit install /var/svn/repos
     ...
@@ -940,7 +942,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     SubGit <code>install</code> command will translate all not yet translated Subversion revisions
     to Git commits, thus eliminating history diversion on Subversion side. Next step will merge in diversed
     Git history back into original repository thus translating it to Subversion. 
-    <literallayout><emphasis role="bold">4) Restore backed up commits</emphasis></literallayout> 
+    <formalpara><title>4) Restore backed up commits</title></formalpara> 
     <literallayout><code>  # go to back up repository cloned at the first stage
   $ cd repos.backup
   # fetch pre-diversion state references
@@ -974,9 +976,9 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         Memory available consists of physical memory and swap, so memory requirement gives an idea of how much memory might be allocated
         by SubGit at peak time, it does not mean that server must have that much physical memory installed.
         </para>
-        <formalpara><title>On SubGit processes:</title><literallayout/>
+        <formalpara><title>On SubGit processes:</title><para><para/>
         At any single moment SubGit would run no more than N + 1 Java processes per repository, where N is a number of concurrent commits or pushes at that very moment.
-        N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</formalpara>
+        N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</para></formalpara>
         <para>Each of the N Java processes (hooks) is ran with the following options by default:
         <literallayout><code>  java -noverify -Xint -Djava.awt.headless=true</code></literallayout>
         Background translation process default options are:
@@ -1034,25 +1036,38 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
    
     </chapter>
     <chapter id="common-server-configurations">
-   <title>Common Server Setups</title>
-    
+    <title>Common Server Setups</title>
+    <para>Sections below show how to install and use SubGit with the most common Subversion server configurations. Each section
+    starts with a description of the existing configuration and proceeds to the step-by-step instructions on how to 
+    set up Subversion/Git replication with SubGit. These howtos assumes that Git repositories are created at their default 
+    locations, i.e. inside Subversion repository.</para>
     <sect1 id="linux-apache">
         <title>Subversion and Git over HTTP(s)</title>
-        <formalpara><title>Setup:</title><itemizedlist>
+        <formalpara><title>Original configuration:</title><itemizedlist>
         <listitem>Subversion repositories are located in the <code>/var/svn</code> directory</listitem>
         <listitem>Apache web server is installed and configured to provide access to those Subversion repositories</listitem>
-        <listitem>SubGit is installed into Subversion repositories and Git repositories are located
-        within Subversion repoistories</listitem>
+        <listitem>Apache web server is ran on behalf of <code>www-data</code> user</listitem>
         <listitem>Users access Subversion repositories at <code>http://host/svn/repositoryName</code> URLs</listitem>
         </itemizedlist>
         </formalpara>
-        <formalpara><title>Goal:</title>Extend Apache web server configuration to make it provide
-        access to the Git repositories.</formalpara>
-        <formalpara><title>Steps:</title><literallayout>  1) Install <ulink url="http://schacon.github.com/git/git-http-backend.html">git-http-backend</ulink> which is a part of Git 1.6.6 or newer
-        
-  2) Add Git directives to the apache configuration file (added lines are shown with bold font):
+        <formalpara><title>Goal:</title>
+        <itemizedlist>
+        <listitem>Create Git mirrors of Subversion repositories</listitem>
+        <listitem>Extend Apache web server configuration to make it provide
+        access to the Git repositories</listitem>
+        </itemizedlist></formalpara>
+        <formalpara><title>Steps:</title>  
+        <para><para/><emphasis role="bold">1) Install SubGit into all Subversion repositories:</emphasis></para>
+        <para><para/>Refer to <xref linkend="installation"/> for more details on how to install SubGit into repository.</para>
+        <literallayout><code>$ <emphasis role="bold">sudo -u www-data</emphasis> subgit install /var/svn/reposistory
+...
+INSTALLATION SUCCESFUL
+...</code></literallayout>
+        <para>Make sure that <code>subgit install</code> command is ran on behalf of the Apache user, in that case <code>www-data</code>.</para>
+        <para><para/><emphasis role="bold">2) Install <ulink url="http://schacon.github.com/git/git-http-backend.html">git-http-backend</ulink> which is a part of Git 1.6.6 or newer</emphasis></para>
+        <para><para/><emphasis role="bold">3) Add Git directives to the apache configuration file (added lines are shown with bold font):</emphasis></para>
   
-  <code> &lt;-- Password protected read and write Subversion repository access --&gt;
+  <literallayout><code> &lt;-- Password protected read and write Subversion repository access --&gt;
   &lt;Location /svn&gt;
     DAV svn
     SVNParentPath "/var/svn"
@@ -1070,28 +1085,91 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     Require valid-user
     AuthType Basic
     AuthUserFile "/path/to/passwd"
-  &lt;/Location&gt;</emphasis></code>
+  &lt;/Location&gt;</emphasis></code></literallayout>
   
-  More configuration examples could be found at the git-http-backend <ulink url="http://schacon.github.com/git/git-http-backend.html">documentation page</ulink>. 
+  <para>More configuration examples could be found at the git-http-backend <ulink url="http://schacon.github.com/git/git-http-backend.html">documentation page</ulink>.</para> 
   
-  3) Reload Apache configuration:
+  <para><para/><emphasis role="bold">4) Reload Apache configuration:</emphasis></para>
   
-  <code> sudo /etc/init.d/apache2 reload</code></literallayout>
-        Users now may access Git repositories at <code>http://host/git/repositoryName</code> for a single-project Subversion repositories or at <code>http://host/git/repositoryName/git/project.git</code>
-        for multi-project Subversion repositories. Users should use same credentials they are using to access Subversion repository. 
-        </formalpara>
+  <literallayout><code> sudo /etc/init.d/apache2 reload</code></literallayout>
+  
+  <para>Users may now access Git repositories at:
+  <itemizedlist> 
+  <listitem><code>http(s)://host/git/repositoryName</code> for a single-project Subversion repositories</listitem> 
+  <listitem><code>http(s)://host/git/repositoryName/git/project.git</code> for a multi-project Subversion repositories</listitem>
+  </itemizedlist> 
+  Users should use same credentials they are using to access Subversion repository. 
+  </para></formalpara>
+        
     </sect1>
     
-    <sect1 id="linux-ssh">
-        <title>Subversion and Git over SSH protocol</title>
-    </sect1>
     
     <sect1 id="linux-shared">
-        <title>Subversion over SVN and Git over SSH protocol</title>
+        <title>Subversion over HTTP(s) and Git over SSH protocol</title>
+        <formalpara><title>Original configuration:</title><itemizedlist>
+        <listitem>Subversion repositories are located in the <code>/var/svn</code> directory</listitem>
+        <listitem>Apache web server is installed and configured to provide access to those Subversion repositories</listitem>
+        <listitem>Apache web server is ran on behalf of <code>www-data</code> user</listitem>
+        <listitem>Users access Subversion repositories at <code>http://host/svn/repositoryName</code> URLs</listitem>
+        </itemizedlist>
+        </formalpara>
+        <formalpara><title>Goal:</title>
+        <itemizedlist>
+        <listitem>Create Git mirrors of Subversion repositories</listitem>
+        <listitem>Let users access Git repositories over SSH protocol on behalf of the <code>git</code> user</listitem>
+        </itemizedlist></formalpara>
+        <formalpara><title>Steps:</title>  
+        <para><para/><emphasis role="bold">1) Install SubGit into all Subversion repositories:</emphasis></para>
+        <para><para/>Refer to <xref linkend="installation"/> for more details on how to install SubGit into repository.</para>
+        <literallayout><code>$ <emphasis role="bold">sudo -u www-data</emphasis> subgit configure /var/svn/reposistory
+...
+CONFIGURATION SUCCESFUL
+...</code></literallayout>
+        <para>Edit <code>repository/conf/subgit.conf</code> file. In this
+        configuration it is important to set SubGit <emphasis role="bold"><code>core.shared</code></emphasis> option to <emphasis role="bold"><code>true</code></emphasis>, 
+        because different users will access Subversion and Git repositories.
+        </para>
+        <literallayout><code>[core]
+  ...
+  <emphasis role="bold">shared = true</emphasis>
+  ...</code></literallayout>
+  <para>Run <code>subgit install</code> to finish SubGit installation into repository:</para>
+  <literallayout><code>$ <emphasis role="bold">sudo -u www-data</emphasis> subgit install /var/svn/reposistory
+...
+INSTALLATION SUCCESFUL
+...</code></literallayout>
+        <para>Make sure that SubGit <code>configure</code> and <code>install</code> commands are ran on behalf of the Apache user, in that case <code>www-data</code>.</para>
+        <para><para/><emphasis role="bold">2) Create <code>git</code> user and set up users groups:</emphasis></para>
+  <literallayout><code>$ sudo useradd -d /home/git -m git
+$ sudo usermod -G git www-data
+$ sudo usermod -G www-data git</code></literallayout>
+  <para>Now <code>git</code> and <code>www-data</code> users shares the same set of groups. See <xref linkend="setup-service-accounts"/> for more details
+  on service users configuration.</para>
+  
+  <para><para/><emphasis role="bold">4) Configure SSH access:</emphasis></para>
+  <para><para/>Add actual Git users SSH public keys to the <code>/home/git/.ssh/authorized_keys</code> file and ensure that <code>sshd</code> daemon is running. For security
+  reasons you may like to look through the <code>/etc/ssh/sshd_config</code> file or its analogue on your system to check that key pair authentication is the only one 
+  enabled for the <code>git</code> user.</para>
+  
+  <para><para/>Users will be able to access Git repositories at:
+  <itemizedlist> 
+  <listitem><code>ssh://git@host/var/svn/repositoryName</code> for a single-project Subversion repositories</listitem> 
+  <listitem><code>ssh://git@host/var/svn/git/project.git</code> for a multi-project Subversion repositories</listitem>
+  </itemizedlist> 
+  There is a good <ulink url="http://git-scm.com/book/en/Git-on-the-Server-Setting-Up-the-Server">article</ulink> describing how to set up SSH access for Git repository
+  in more details. 
+  </para>
+  <para><para/>Subversion repositories will remain available over HTTP(s) just as before at:
+  <itemizedlist> 
+  <listitem><code>http(s)://host/svn/repositoryName</code></listitem> 
+  </itemizedlist> 
+  </para>
+  </formalpara>
+        
     </sect1>
     
     <sect1 id="windows-visualsvn">
-        <title>SubGit with VisualSVN</title>
+        <title>SubGit with VisualSVN on Windows</title>
     </sect1>
 
     <sect1 id="windows-ubersvn">
@@ -1103,6 +1181,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     <chapter id="linux-issues">
         <title>Troubleshooting SubGit on Linux / OS X</title>
     </chapter>
+    
     <chapter id="windows-issues">
         <title>Troubleshooting SubGit on Windows</title>
     </chapter>
