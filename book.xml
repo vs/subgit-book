@@ -287,7 +287,7 @@
         One have to run <code>configure</code> command on behalf of the same user account that would be used to access Subversion or Git repository. Use
         <code>sudo</code> command on Linux or OS X or Administrator account on Windows if necessary. Examples below assume Ubuntu Linux and commands are ran on
         behalf of <code>www-data</code> user that runs Apache Web Server on that system.</para> 
-        <para>When <code>configure</code> command is ran on a repository with a single project one will get the following output:</para>
+        <para>When <code>configure</code> command is run on a repository with a single project one will get the following output:</para>
 <literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
 SubGit version 1.0.0 ('Miai') build #1600
 
@@ -305,7 +305,7 @@ To complete SubGit installation do the following:
     /var/svn/svn_repository/conf/authors.txt
 3) run SubGit 'install' command:
     subgit install svn_repository</code></literallayout>
-        <para>When SubGit <code>configure</code> is ran on repository with two projects, mapping will be displayed for the both detected projects:</para>
+        <para>When SubGit <code>configure</code> is run on repository with two projects, mapping will be displayed for the both detected projects:</para>
 <literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
 SubGit version 1.0.0 ('Miai') build #1600
 
@@ -625,7 +625,7 @@ On Windows OS <code>.cmd</code> or <code>.bat</code> extension should be added t
         </itemizedlist>
         </formalpara>
 
-        <formalpara><title>Changes that become effective after '<code>subgit install</code>' is ran:</title>
+        <formalpara><title>Changes that become effective after '<code>subgit install</code>' is run:</title>
         <itemizedlist>
         <listitem>Modification of the <code>core.authorsFile</code> and <code>core.shared</code> options in <code>subgit.conf</code> file</listitem>
         <listitem>Addition of the new <code>[git]</code> section to the <code>subgit.conf</code> file</listitem>
@@ -637,7 +637,7 @@ On Windows OS <code>.cmd</code> or <code>.bat</code> extension should be added t
         to run <code>subgit uninstall</code> first, then to remove <code>[git]</code> section and the to run <code>subgit install</code> to apply changes. This
         way one would ensure that SubGit specific hooks are removed from the Git repository.</para></note>
 
-        <formalpara><title>Changes that become effective after '<code>subgit install --rebuild</code>' is ran:</title>
+        <formalpara><title>Changes that become effective after '<code>subgit install --rebuild</code>' is run:</title>
         <itemizedlist>
         <listitem>Modification of the existing projects and branches mappings (any modifications within <code>[git]</code> sections of the <code>subgit.conf</code> file)</listitem>
         </itemizedlist>
@@ -979,7 +979,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         <formalpara><title>On SubGit processes:</title><para><para/>
         At any single moment SubGit would run no more than N + 1 Java processes per repository, where N is a number of concurrent commits or pushes at that very moment.
         N processes are those started by SubGit hooks and additional process is a background translation process (daemon) that performs actual translation.</para></formalpara>
-        <para>Each of the N Java processes (hooks) is ran with the following options by default:
+        <para>Each of the N Java processes (hooks) is run with the following options by default:
         <literallayout><code>  java -noverify -Xint -Djava.awt.headless=true</code></literallayout>
         Background translation process default options are:
         <literallayout><code>  java -noverify -client -Djava.awt.headless=true</code></literallayout>
@@ -1046,7 +1046,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
         <formalpara><title>Original configuration:</title><itemizedlist>
         <listitem>Subversion repositories are located in the <code>/var/svn</code> directory</listitem>
         <listitem>Apache web server is installed and configured to provide access to those Subversion repositories</listitem>
-        <listitem>Apache web server is ran on behalf of <code>www-data</code> user</listitem>
+        <listitem>Apache web server is run on behalf of <code>www-data</code> user</listitem>
         <listitem>Users access Subversion repositories at <code>http://host/svn/repositoryName</code> URLs</listitem>
         </itemizedlist>
         </formalpara>
@@ -1063,7 +1063,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
 ...
 INSTALLATION SUCCESFUL
 ...</code></literallayout>
-        <para>Make sure that <code>subgit install</code> command is ran on behalf of the Apache user, in that case <code>www-data</code>.</para>
+        <para>Make sure that <code>subgit install</code> command is run on behalf of the Apache user, in that case <code>www-data</code>.</para>
         <para><para/><emphasis role="bold">2) Install <ulink url="http://schacon.github.com/git/git-http-backend.html">git-http-backend</ulink> which is a part of Git 1.6.6 or newer</emphasis></para>
         <para><para/><emphasis role="bold">3) Add Git directives to the apache configuration file (added lines are shown with bold font):</emphasis></para>
   
@@ -1109,7 +1109,7 @@ INSTALLATION SUCCESFUL
         <formalpara><title>Original configuration:</title><itemizedlist>
         <listitem>Subversion repositories are located in the <code>/var/svn</code> directory</listitem>
         <listitem>Apache web server is installed and configured to provide access to those Subversion repositories</listitem>
-        <listitem>Apache web server is ran on behalf of <code>www-data</code> user</listitem>
+        <listitem>Apache web server is run on behalf of <code>www-data</code> user</listitem>
         <listitem>Users access Subversion repositories at <code>http://host/svn/repositoryName</code> URLs</listitem>
         </itemizedlist>
         </formalpara>
@@ -1226,7 +1226,7 @@ ScriptAlias /git/ "data/msysgit/libexec/git-core/git-http-backend.exe/"
         
         <para><para/><emphasis role="bold">3) Restart WANDisco Apache service</emphasis></para>
         <para><para/>In the Services section of the Windows Control Panel, ensure that WANDisco Apache 
-        service is ran on behalf of Administrator user and restart this service.</para>
+        service is run on behalf of Administrator user and restart this service.</para>
 
   <para><para/>Users will be able to access Git repositories at:
   <itemizedlist> 
