@@ -997,7 +997,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     Default timeout is 0, i.e. background translation process exits as soon as translation is over and there are no more revisions or commits to translate.
     Timeout value is specified in seconds and <code>infinity</code> value means that process should never exit.
         </para>
-        <para>Run <code>subgit install</code> after changing <code>conf/subgit.conf</code> file for the changs to become effective.</para>
+        <para>Run <code>subgit install</code> after changing <code>conf/subgit.conf</code> file for the changes to become effective.</para>
     </chapter>
     
     <chapter id="os-installation"><title>Installing SubGit Tool</title>
