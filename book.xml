@@ -1017,7 +1017,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     <listitem>If necessary, download and install most recent version of the Java SE JDK from the Java <ulink url="http://www.oracle.com/technetwork/java/javase/downloads/index.html">download page</ulink>;</listitem>
     <listitem>Download SubGit <emphasis role="bold">zip archive</emphasis> file from SubGit <ulink url="http://subgit.com/download">download page</ulink>;</listitem>
     <listitem>Acting as the <code>root</code> user, unpack all files from SubGit archive into <code>/opt/subgit/</code> directory;</listitem>
-    <listitem>Append <code>/opt/subgit</code> to the PATH variable, e.g. in the <code>/etc/profile</code> file.</listitem>
+    <listitem>Append <code>/opt/subgit/bin</code> to the PATH variable, e.g. in the <code>/etc/profile</code> file.</listitem>
     </itemizedlist>
     Now you may run <code>subgit</code> command from the command line. Test it by running <code>subgit --version</code> command. 
     To upgrade SubGit tool, delete all files from the <code>/opt/subgit</code> directory and repeat above steps with the SubGit zip archive.
