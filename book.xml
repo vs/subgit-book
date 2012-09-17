@@ -516,29 +516,6 @@ INSTALLATION SUCCESSFUL</code></literallayout>
         <para>Git users will clone Git repository on the server side to start working with the project locally.
         There are number of configuration options that is recommended to add to the clone's <code>.git/config</code> configuration file.
         These options are not required, but merely recommended for better user experience.</para>
-        <literallayout><code><emphasis role="bold">.git/config file:</emphasis>
-...
-[merge]
-    ff = false            
-[fetch "origin"]
-    ...
-    fetch += +refs/svn/map:refs/notes/commits
-    ...
-    tagopt = '--tags'
-        </code></literallayout>
-        <formalpara><title>Disable fast forward merges:</title>
-        <para>
-        <literallayout><code>[merge]
-    ff = <emphasis role="bold">false</emphasis></code></literallayout>
-    <para>Or, for Git 1.7.5 or older (for each branch):</para>
-    <literallayout><code>[branch "master"]
-    mergeoptions = <emphasis role="bold">'--no-ff'</emphasis></code></literallayout>
-        With fast-forward merges disabled, Git will always create merge commit for a merge. SubGit translation
-        engine benefits from the presence of such commits and translates them to the most reasonable merge tracking
-        information. When merge is fast-forward, SubGit translation engine will merely replace branch with its ancestor
-        at certain revision and no merge tracking information would be created.</para>
-        </formalpara>
-
         <formalpara><title>Fetch SubGit mapping information:</title>
         <para>
         <literallayout><code>[remote "origin"]
