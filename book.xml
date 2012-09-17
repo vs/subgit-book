@@ -267,7 +267,7 @@
         <para>Alternatively, in <xref xrefstyle="select: label" linkend="users-differ"/> scenario all accounts may share the same primary group.</para>
         <para>To display and change user's primary group one may use the following commands:<literallayout><code>  $ sudo groups git svn
   git : git
-  svn :svn
+  svn : svn
   $ sudo usermod -g svn git
   $ sudo groups git svn
   git : svn
@@ -371,8 +371,8 @@ CONFIGURATION SUCCESSFUL
         <formalpara><title>Provide authors mapping:</title>
         <para>Write Subversion users to Git authors mapping to <code>conf/authors.txt</code> file (see <xref linkend="authors-mapping"/>). For instance:
         <literallayout><code><emphasis role="bold">conf/authors.txt</emphasis>: 
-semen = Semen Vadishev (semen@tmatesoft.com)
-dmitry = Dmitry Pavlenko (pavlenko@tmatesoft.com)</code></literallayout></para>
+semen = Semen Vadishev &lt;vadishev@tmatesoft.com&gt;
+dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></para>
         </formalpara>
 
         <formalpara><title>Or specify existing authors mapping file:</title>
@@ -435,9 +435,9 @@ tags/
     translationRoot = /
 
     trunk = trunk/project:refs/heads/master
-    branches = branches/project:refs/heads/*
-    shelves = shelves/project:refs/shelves/*
-    tags = tags/project:refs/tags/*
+    branches = branches/project/*:refs/heads/*
+    shelves = shelves/project/*:refs/shelves/*
+    tags = tags/project/*:refs/tags/*
     
 [git "library"]
     repository = /var/git/library.git
@@ -445,9 +445,9 @@ tags/
     translationRoot = /
 
     trunk = trunk/library:refs/heads/master
-    branches = branches/library:refs/heads/*
-    shelves = shelves/library:refs/shelves/*
-    tags = tags/library:refs/tags/*</code></literallayout>
+    branches = branches/library/*:refs/heads/*
+    shelves = shelves/library/*:refs/shelves/*
+    tags = tags/library/*:refs/tags/*</code></literallayout>
     Note that <code>git.translationRoot</code> options have similar value in both projects. This option specify a path
     relative to which branches and tags mapping paths are expanded. 
         </para>
@@ -896,7 +896,10 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
   $ git clone /var/svn/repos repos.backup
     
   # track all remote branches on which there are untranslated commits
-  $ git checkout master</code></literallayout>
+  $ cd repos.backup
+  $ git checkout master
+  ...
+  $ git checkout foo</code></literallayout>
      
     <formalpara><title>2) Reset Git references to the pre-diversion state</title></formalpara>
     Branch and tag references to the last translated commits are stored in the <code>refs/svn/root</code> namespace
@@ -919,7 +922,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
   $ git update-ref refs/tags/1.0 refs/svn/root/tags/1.0
   
   # In case diverged history includes creation of a new branch or tag, then
-  # it have to be deleted:
+  # it has to be deleted:
   
   $ git branch -D missing
   $ git tag -D missingTag</code></literallayout>
@@ -1001,7 +1004,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     </chapter>
     
     <chapter id="os-installation"><title>Installing SubGit Tool</title>
-    <para>Before install SubGit into Subversion repository, <code>subgit</code> tool itself has to be installed on your server.
+    <para>Before installing SubGit into Subversion repository, <code>subgit</code> tool itself has to be installed on your server.
     Make sure your server meets SubGit system requirements (see <xref linkend="system-requirements" xrefstyle="select: label"/>) and follow instructions below on how to install SubGit tool.</para>
     <formalpara><title>On Debian-based or Ubuntu OS:</title>
     <itemizedlist>
@@ -1039,7 +1042,7 @@ $ cp /var/svn/repos/.git/hooks/user-pre-receive.backup /var/svn/repos/.git/hooks
     <title>Common Server Setups</title>
     <para>Sections below show how to install and use SubGit with the most common Subversion server configurations. Each section
     starts with a description of the existing configuration and proceeds to the step-by-step instructions on how to 
-    set up Subversion/Git replication with SubGit. These howtos assumes that Git repositories are created at their default 
+    set up Subversion/Git replication with SubGit. These howtos assume that Git repositories are created at their default 
     locations, i.e. inside Subversion repository.</para>
     <sect1 id="linux-apache">
         <title>Subversion and Git over HTTP(s)</title>
