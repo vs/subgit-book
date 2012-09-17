@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <book xmlns:xi="http://www.w3.org/2001/XInclude" xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0">
     <bookinfo>
-        <title>Practical Guide To SubGit</title>
+        <title>SubGit Book</title>
         <subtitle>Safe Svn to Git Migration</subtitle>
         <releaseinfo/>
         <copyright>
@@ -50,6 +50,32 @@
         </itemizedlist>
         </para>
         </formalpara>
+    </chapter>
+
+    <chapter id="features">
+        <title>SubGit Features</title>        
+        
+        <para>As a server-side application, SubGit
+        <itemizedlist>
+            <listitem>Provides fast asynchronous replication that introduces minimal overhead</listitem>
+            <listitem>Puts no limits on Git and Subversion users</listitem>
+            <listitem>Fits well into existing server-side infrastructure</listitem>
+        </itemizedlist>
+        SubGit includes powerful translation engine, which would translate
+        <itemizedlist>
+            <listitem>merge tracking information and merge history</listitem>
+            <listitem>non-linear Git commits history to Subversion</listitem>
+            <listitem>subprojects, tags and branches</listitem>
+            <listitem>svn:ignore and .gitignore ignore definitions</listitem>
+            <listitem>svn:eol-style and .gitattributes special properties</listitem>
+            <listitem>symbolic links</listitem>
+            <listitem>commit authors and dates</listitem>
+            <listitem>files and directories renames</listitem>
+        </itemizedlist>
+        There are a few limitations on translation (see <xref linkend="limitations"/>). These 
+        limitations only affects translation, and do not prevent Git and Subversion from being
+        used to their full extents.
+        </para>
     </chapter>
 
     <chapter id="translation">
@@ -1228,14 +1254,38 @@ ScriptAlias /git/ "data/msysgit/libexec/git-core/git-http-backend.exe/"
         <title>SubGit with VisualSVN Server on Windows</title>
     </sect1>
     -->
+    
     </chapter>
     
+    <!-- 
     <chapter id="linux-issues">
         <title>Troubleshooting SubGit on Linux / OS X</title>
+        <para>
+        </para>
     </chapter>
     
     <chapter id="windows-issues">
         <title>Troubleshooting SubGit on Windows</title>
+        <para>
+        </para>
     </chapter>
-
+    -->
+    
+    <chapter id="contacts">
+    <title>Useful Links and Contacts</title>
+    
+    <para>
+    Please feel free to contact us at <ulink url="mailto:support@subgit.com">support@subgit.com</ulink>. We'd be glad 
+    to address issues you may have with SubGit or to provide more information on how one may get most out of SubGit. We appreciate your feedback!</para>
+    <para>
+    The following links would be of use if you would like to report an issue or to talk to SubGit developers 
+    on SubGit features:
+    <itemizedlist>
+    <listitem>SubGit issues tracker: <ulink url="http://issues.tmatesoft.com/issues/SGT">http://issues.tmatesoft.com/issues/SGT/</ulink></listitem>
+    <listitem>SubGit mailing list: send email to <ulink url="mailto:subgit-users-subscribe@subgit.com">subgit-users-subscribe@subgit.com</ulink> to subscribe</listitem>
+    </itemizedlist>
+    Follow <emphasis role="bold"><ulink url="https://twitter.com/subgit">@subgit</ulink></emphasis> twitter account or <ulink url="https://plus.google.com/b/114128677298030695536/114128677298030695536/posts">SubGit page on Google+</ulink> 
+    to stay up-to-date with SubGit development.
+    </para>    
+    </chapter>
 </book>
