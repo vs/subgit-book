@@ -1217,7 +1217,7 @@ SetEnv GIT_HTTP_EXPORT_ALL
 
 ScriptAlias /git/ "data/msysgit/libexec/git-core/git-http-backend.exe/"
 
-&lt;Location /git&lt;
+&lt;Location /git&gt;
   Options +ExecCGI
 
   Require valid-user
@@ -1228,7 +1228,7 @@ ScriptAlias /git/ "data/msysgit/libexec/git-core/git-http-backend.exe/"
 
   Order allow,deny
   Allow from all
-&lt;/Location&lt;</code></literallayout>
+&lt;/Location&gt;</code></literallayout>
         
         <para><para/><emphasis role="bold">3) Restart WANdisco Apache service</emphasis></para>
         <para><para/>In the Services section of the Windows Control Panel, ensure that WANdisco Apache 
