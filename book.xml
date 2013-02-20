@@ -1083,7 +1083,7 @@ INSTALLATION SUCCESSFUL
   &lt;/Location&gt;
 
   <emphasis role="bold">SetEnv GIT_PROJECT_ROOT /var/svn
-  SetEnv GIT_HTTP_EXPORT_ALL
+  SetEnv GIT_HTTP_EXPORT_ALL 1
   ScriptAlias /git/ /usr/lib/git-core/git-http-backend/</emphasis>
 
   &lt;-- Password protected read and write Git repository access --&gt;
@@ -1213,7 +1213,7 @@ LoadModule env_module modules/mod_env.so
 LoadModule authz_user_module modules/mod_authz_user.so
 
 SetEnv GIT_PROJECT_ROOT "C:/Program Files/WANdisco/uberSvn/repositories"
-SetEnv GIT_HTTP_EXPORT_ALL
+SetEnv GIT_HTTP_EXPORT_ALL 1
 
 ScriptAlias /git/ "data/msysgit/libexec/git-core/git-http-backend.exe/"
 
