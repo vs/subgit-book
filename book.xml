@@ -546,7 +546,7 @@ INSTALLATION SUCCESSFUL</code></literallayout>
         <para>
         <literallayout><code>[remote "origin"]
     ...
-    <emphasis role="bold">fetch += +refs/svn/map:refs/notes/commits</emphasis></code></literallayout>
+    <emphasis role="bold">fetch = +refs/svn/map:refs/notes/commits</emphasis></code></literallayout>
         <code>refs/notes/commmits</code> reference points to the so called notes that contains Subversion to Git 
         mapping information for each commit. With these notes fetched <code>git log</code> command will show
         mapping information alongside with the commit message in the log output:
