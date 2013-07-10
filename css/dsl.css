@@ -1,0 +1,116 @@
+
+.sidebar {
+    margin-top: 2em;
+    margin-left: 1.8em;
+    margin-right: 1.4em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 13em;
+}
+
+.content {
+    margin-top: 2em;
+    margin-bottom: 2em;
+    margin-left: 4em;
+    margin-right: 4em;
+    position: absolute;
+    top: 0;
+    left: 14.6em;
+}
+
+.sidebar ul {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.sidebar li {
+    list-style: none;
+}
+
+.sidebar li.sidebarHeading {
+    margin-top: 1.4em;
+    margin-bottom: 0.4em;
+    font-weight: bold;
+    color: #505050;
+}
+
+.sidebar li.selected {
+    font-weight: bold;
+    font-size: 110%;
+    color: #5283a1;
+    /*color: #505050;*/
+    background-color: #ebf4f7;
+    border: solid #c3d9e6 1px;
+    padding-top: 0.1em;
+    padding-bottom: 0.1em;
+    margin-left: -0.7em;
+    padding-left: 0.7em;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
+
+.sidebar ul.sections {
+    padding-left: 1em;
+}
+
+.book .titlepage .releaseinfo {
+    color: #666666;
+}
+
+.segmentedlist {
+    margin-top: 1.6em;
+    margin-bottom: 1.6em;
+}
+
+.segmentedlist table, .table table {
+    border: solid #d0d0d0 1px;
+    border-collapse: collapse;
+    margin-left: -0.8em;
+    margin-right: -0.8em;
+}
+
+.segmentedlist th {
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    color: #505050;
+}
+
+.segmentedlist td {
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+}
+
+.segmentedlist dt {
+    font-weight: bold;
+}
+
+.signature {
+    background-color: #f5f5f5;
+    border: solid #e7e7e7 1px;
+    color: #666666;
+    width: auto;
+    margin-right: -0.8em;
+    padding-right: 0.8em;
+    margin-left: -0.8em;
+    padding-left: 0.8em;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    font-weight: normal;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.signature .literal {
+    font-size: 120%;
+    font-weight: bold;
+    color: #5283a1;
+    padding-left: 0.4em;
+    padding-right: 0.2em;
+}
