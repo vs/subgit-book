@@ -325,83 +325,69 @@ Valid options:
         </sect1>
 
         <sect1><title>Run <code>subgit configure</code></title>
-        <para>Run SubGit <code>configure</code> command to make SubGit detect projects in Subversion repository and generate initial SubGit configuration for them.
-        One have to run <code>configure</code> command on behalf of the same user account that would be used to access Subversion or Git repository. Use
-        <code>sudo</code> command on Linux or OS X or Administrator account on Windows if necessary. Examples below assume Ubuntu Linux and commands are ran on
-        behalf of <code>www-data</code> user that runs Apache Web Server on that system.
+        <para>Run SubGit <code>configure</code> command to make SubGit create empty bare Git repository and link it with a project in Subversion
         </para> 
-        <para>When <code>configure</code> command is run on a repository with a single project one will get the following output:</para>
-<literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
-SubGit version 1.0.2 ('Miai') build #1730
+        <para>When running <code>configure</code> command user have to specify Subversion project URL and, optionally, minimal revision
+        to start synchronization from:</para>
+<literallayout><code>$ <emphasis role="bold">subgit configure --svn-url http://svn.svnkit.com/repos/sqljet sqljet.git</emphasis>
+SubGit version 2.0.0 ('Patrick') build #2552
 
-Detecting paths eligible for translation... done.
-Subversion to Git mapping has been configured:
-    <emphasis role="bold">&lt;root&gt; : /var/svn/svn_repository/.git</emphasis>
-
-CONFIGURATION SUCCESSFUL
-
-To complete SubGit installation do the following:
-
-1) adjust SubGit configuration file, if necessary:
-    /var/svn/svn_repository/conf/subgit.conf
-2) add custom authors mapping to the authors.txt file at:
-    /var/svn/svn_repository/conf/authors.txt
-3) run SubGit 'install' command:
-    subgit install svn_repository</code></literallayout>
-        <para>When SubGit <code>configure</code> is run on repository with two projects, mapping will be displayed for the both detected projects:</para>
-<literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit configure svn_repository</emphasis>
-SubGit version 1.0.2 ('Miai') build #1730
-
-Detecting paths eligible for translation... done.
-Subversion to Git mapping has been configured:
-    <emphasis role="bold">/project1 : /var/svn/svn_repository/git/project1.git</emphasis>
-    <emphasis role="bold">/project2 : /var/svn/svn_repository/git/project2.git</emphasis>
+Configuring writable Git mirror of remote Subversion repository:
+    Subversion repository URL : http://svn.svnkit.com/repos/sqljet
+    Git repository location   : sqljet.git
 
 CONFIGURATION SUCCESSFUL
-...</code></literallayout>
-        <para>At configuration stage SubGit does not actually create Git repositories, but generates configuration file with the information on detected projects
-        and mappings. Changes to Subversion repository made by the <code>configure</code> command are shown below:</para>
-<literallayout><code>svn_repository/
-  conf/
-      <emphasis role="bold">authors.txt</emphasis>   # default authors mapping (empty)
-      authz
-      passwd
-      <emphasis role="bold">subgit.conf</emphasis>   # projects mapping and general options
-      svnserve.conf
-  db/
-  hooks/
-  locks/
-  <emphasis role="bold">subgit/</emphasis>           # subgit binaries, logs and temporary directory
-  format
-  README.txt</code></literallayout>
+</code></literallayout>
+        <para>At configuration stage SubGit does not establish connect with Subversion repository, but generates configuration file with the information 
+        necessary to proceed with installation. Files added to the Git repository by the <code>configure</code> command are shown below:</para>
+<literallayout><code>git_repository/
+  branches
+  hooks
+  logs
+  objects
+  refs
+  <emphasis role="bold">subgit/</emphasis>
+      lib/          # SubGit binaries
+      logs/         # SubGit logs
+      authors.txt   # default authors mapping (empty)
+      config        # SubGit configuration file
+      passwd        # Password credentials to access Subversion repository
+      format        # Information on SubGit version
+  config            # Git configuration file
+  HEAD</code></literallayout>
         </sect1>
 
         <sect1><title>Adjust configuration</title>
-        <para>SubGit <code>configure</code> command detects projects in Subversion repository and writes configuration and mappings to the <code>SVN_REPOS/conf/subgit.conf</code> file. 
-        Generated configuration have to be adjusted or extended when:
-        <itemizedlist>
-        <listitem>project in Subversion repository was not detected by <code>subgit configure</code> command.</listitem>
-        </itemizedlist>
-        <code>subgit.conf</code> file generated for a single-project Subversion repository will look like this (some of the less frequently used options are not shown here):   
+        <para>SubGit <code>configure</code> command creates bare empty Git repository and writes default configuration and mappings to the <code>GIT_REPOS/subgit/config</code> file. 
+        Generated default configuration have to be adjusted before proceeding with install stage, in particular user have to provide credentials (or specify where to find them)
+        to let SubGit access Subversion repository.
+        <code>config</code> file generated by default will look like this (some of the less frequently used options are not shown here):   
         </para>
         <literallayout><code>[core]
-    shared = false
-    authorsFile = conf/authors.txt
-
-[git "default"]
-
-    translationRoot = /
-    repository = .git
+    authorsFile = subgit/authors.txt
     pathEncoding = UTF-8
+    defaultDomain = tmatesoft.com
+
+[svn]
+    url = http://svn.svnkit.com/repos/sqljet
 
     trunk = trunk:refs/heads/master
     branches = branches/*:refs/heads/*
-    shelves = shelves/*:refs/shelves/*
     tags = tags/*:refs/tags/*
-    
-    minimalRevision = 0</code></literallayout>
-        <note><title>Paths in <code>subgit.conf</code> file:</title><para>File system paths in <code>subgit.conf</code> file could be specified in relative or absolute form. Relative paths are those
-        that do not start with '/' or drive letter on Windows OS. Relative paths are treated as relative to the Subversion repository root directory.</para></note>
+    shelves = shelves/*:refs/shelves/*
+
+    fetchInterval = 60
+    connectTimeout = 30
+    readTimeout = 60
+
+    auth = default
+
+[auth "default"]
+    passwords = subgit/passwd
+    useDefaultSubversionConfigurationDirectory = false
+    subversionConfigurationDirectory = /home/user/subversion</code></literallayout>
+        <note><title>Paths in <code>subgit/config</code> file:</title><para>File system paths in <code>subgit/config</code> file could be specified in relative or absolute form. Relative paths are those
+        that do not start with '/' or drive letter on Windows OS. Relative paths are treated as relative to the Git repository root directory.</para></note>
         <formalpara><title>Provide authors mapping:</title>
         <para>Write Subversion users to Git authors mapping to <code>conf/authors.txt</code> file (see <xref linkend="authors-mapping"/>). For instance:
         <literallayout><code><emphasis role="bold">conf/authors.txt</emphasis>: 
@@ -418,19 +404,18 @@ dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></
         Path is either relative to the Subversion repository root (e.g. conf/authors.txt expands to SVN_REPOS/conf/authors.txt) or absolute.</para>
         </formalpara>
 
-        <formalpara><title>Adjust Git repository location:</title>
+        <formalpara><title>Provide default domain for missing emails:</title>
         <para>
-        <literallayout><code>[git "default"]
-    ... 
-    repository = <emphasis role="bold">/var/git/project.git</emphasis></code></literallayout>
-        Specify path whether you would like Git repository to be created. By default, Git repositories are created within Subversion repository, at <code>SVN_REPOS/.git</code> in
-        a single-project repository and at <code>SVN_REPOS/git/project.git</code> in a multi-project repository. This way allows one to  copy or move Subversion and connected Git 
-        repositories with a single filesystem command. Change Git repository path to the one which fits your environment better.</para>
+        <literallayout><code>[core]
+    ...
+    defaultDomain = <emphasis role="bold">company.com</emphasis></code></literallayout>
+        Email have to be part of the Git author information, some of the Git operations may fail when email is not present. SubGit
+        will use <code>core.defaultDomain</code> value to generate author's email when author is not found in the authors mapping
+        or in case authors mapping doesn't provide email.</para>
         </formalpara>
-
         <formalpara><title>Set path encoding to be used in Git repository:</title>
         <para>
-        <literallayout><code>[git "default"]
+        <literallayout><code>[core]
     ...
     pathEncoding = <emphasis role="bold">UTF-8</emphasis></code></literallayout>
         Git stores paths as a sequence of bytes, without encoding specified. Usually paths ends up in Git as-is, i.e. in the local file system encoding.
@@ -438,55 +423,61 @@ dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></
         Most modern file systems use or could be configured to use UTF-8 encoding and this is default and recommended value.</para>
         </formalpara>
 
+        <formalpara><title>Adjust Subversion project location and branches mapping:</title>
+        <para>
+        <literallayout><code>[svn]
+    ... 
+    url = <emphasis role="bold">http://host/svn/repos</emphasis>
+</code></literallayout>
+        <code>svn.url</code> option value specifies project location. It is used as the root URL relative to which mappings paths are treated.</para>
+        
+        <para>
+        <literallayout><code>[svn]
+    ... 
+    trunk = trunk:refs/heads/master
+    branches = branches/*:refs/heads/*
+    tags = tags/*:refs/tags/*
+    shelves = shelves/*:refs/shelves/*</code></literallayout>
+        There are four kinds of branches that have to be mapped, each represented by its own option: <emphasis role="bold">trunk</emphasis>, 
+        <emphasis role="bold">branches</emphasis>, <emphasis role="bold">tags</emphasis> and <emphasis role="bold">shelves</emphasis>. Each option establishes  
+        SVN_PATH to GIT_REFERENCE correspondense for a particular kind of entity. 
+        Mapping syntax for <emphasis role="bold">trunk</emphasis> is:
+        <literallayout><code>
+trunk = SVN_PATH:GIT_REFERENCE</code></literallayout>
+        <code>svn.trunk</code> option allows to specify single <code>SVN_PATH:GIT_REFERENCE</code> mapping as its value. <code>SVN_PATH</code>
+        is a path relative to the project <code>svn.url</code> location and <code>GIT_REFERENCE</code> is a git reference e.g. <code>refs/heads/master</code>.
+        Mapping meaning is that changes made on or below <code>SVN_PATH</code> in Subversion project translated to the Git commits on <code>GIT_REFERENCE</code> and conversly,
+        commits on <code>GIT_REFERENCE</code> would be translated to the changes below <code>SVN_PATH</code>.   
+        Mapping syntax for <emphasis role="bold">branches, tags</emphasis> and <emphasis role="bold">shelves</emphasis> is:
+        <literallayout><code>
+branches = SVN_PATH[/*]:GIT_REFERENCE[/*][;MAPPING]</code></literallayout>
+        These option allows to specify multiple mappings and each mapping may define many-to-many relationship. Mapping could be either one-to-one or
+        many-to-many, in other words when '*' wildcard is used it should be present in the both sides of mapping. Each of the options must contain
+        at least one many-to-many mapping (one with '*' wildcard). For example:
+        <literallayout><code>
+branches = branches/*:refs/heads/*;release_branhces/b1:refs/release/b1</code></literallayout>
+        Above mapping maps all branches in Subversion <code>branches</code> directory to the Git <code>refs/heads</code> namespace and,
+        additionally, maps single <code>release_branches/b1</code> branch to <code>refs/releases/b1</code> Git branch reference.
+        </para>
+        <para>
+        Be careful when specifying mapping, it would not be possible to adjust it when synchronization is enabled. Only branches and tags
+        that are included in the mapping will be imported and kept in sync by SubGit.
+        </para>
+        </formalpara>
         <formalpara><title>Set revision to start translation from:</title>
         <para>
-        <literallayout><code>[git "default"]
+        <literallayout><code>[svn]
     ...
     minimalRevision = <emphasis role="bold">1024</emphasis></code></literallayout>
-        Set <code>git.minimalRevision</code> to Subversion revision from which translation should be started. Revisions older than specified 
+        Set <code>svn.minimalRevision</code> to Subversion revision from which translation should be started. Revisions older than specified 
         would not be translated and would not be present in the Git repository. Limiting range of revisions with this option may reduce initial
         translation time.</para>
         </formalpara>
 
-        <formalpara><title>Add projects that have not being detected automatically:</title>
-        <para><para/>Some projects with non-standard layout may not be detected by SubGit (see <xref linkend="projects-mapping"/> and <xref linkend="branches-mapping"/>). In case it is possible 
-        to distinguish trunk, branches and tags directories for those projects one may add them manually to the configuration file.</para>
-        <para>Consider the following layout for <code>project</code> and <code>library</code> project:
-        <literallayout><code>trunk/
-    project/
-    library/        
-branches/
-    project/
-    library/
-tags/
-    project/
-    library/</code></literallayout>
-    Corresponding <code>[git]</code> sections should be added to <code>subgit.conf</code> file to enable translation 
-    and synchronizations of these projects:
-        <literallayout><code>[git "project"]
-    repository = /var/git/project.git
-    
-    translationRoot = /
-
-    trunk = trunk/project:refs/heads/master
-    branches = branches/project/*:refs/heads/*
-    shelves = shelves/project/*:refs/shelves/*
-    tags = tags/project/*:refs/tags/*
-    
-[git "library"]
-    repository = /var/git/library.git
-    
-    translationRoot = /
-
-    trunk = trunk/library:refs/heads/master
-    branches = branches/library/*:refs/heads/*
-    shelves = shelves/library/*:refs/shelves/*
-    tags = tags/library/*:refs/tags/*</code></literallayout>
-    Note that <code>git.translationRoot</code> options have similar value in both projects. This option specify a path
-    relative to which branches and tags mapping paths are expanded. 
-        </para>
+        <formalpara><title>Provide credentials:</title>
+        <para></para>
         </formalpara>
-        <para>One will find more options in the <code>conf/subgit.conf</code> file, as well as documentation 
+        <para>One will find more options in the <code>subgit/config</code> file, as well as documentation 
         on what these options control.</para>
         </sect1>
         <sect1><title>Run <code>subgit install</code></title>
