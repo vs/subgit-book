@@ -357,7 +357,7 @@ CONFIGURATION SUCCESSFUL
   HEAD</code></literallayout>
         </sect1>
 
-        <sect1><title>Adjust configuration</title>
+        <sect1><title>Adjust configuration: overview</title>
         <para>SubGit <code>configure</code> command creates bare empty Git repository and writes default configuration and mappings to the <code>GIT_REPOS/subgit/config</code> file. 
         Generated default configuration have to be adjusted before proceeding with install stage, in particular user have to provide credentials (or specify where to find them)
         to let SubGit access Subversion repository.
@@ -388,12 +388,12 @@ CONFIGURATION SUCCESSFUL
     subversionConfigurationDirectory = /home/user/subversion</code></literallayout>
         <note><title>Paths in <code>subgit/config</code> file:</title><para>File system paths in <code>subgit/config</code> file could be specified in relative or absolute form. Relative paths are those
         that do not start with '/' or drive letter on Windows OS. Relative paths are treated as relative to the Git repository root directory.</para></note>
-        <formalpara><title>Provide authors mapping:</title>
+        </sect1>
+        <sect1><title>Adjust configuration: provide authors mapping</title>
         <para>Write Subversion users to Git authors mapping to <code>conf/authors.txt</code> file (see <xref linkend="authors-mapping"/>). For instance:
         <literallayout><code><emphasis role="bold">conf/authors.txt</emphasis>: 
 semen = Semen Vadishev &lt;vadishev@tmatesoft.com&gt;
 dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></para>
-        </formalpara>
 
         <formalpara><title>Or specify existing authors mapping file:</title>
         <para>
@@ -413,7 +413,8 @@ dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></
         will use <code>core.defaultDomain</code> value to generate author's email when author is not found in the authors mapping
         or in case authors mapping doesn't provide email.</para>
         </formalpara>
-        <formalpara><title>Set path encoding to be used in Git repository:</title>
+        </sect1>
+       <sect1><title>Adjust configuration: path encoding</title>
         <para>
         <literallayout><code>[core]
     ...
@@ -421,9 +422,8 @@ dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></
         Git stores paths as a sequence of bytes, without encoding specified. Usually paths ends up in Git as-is, i.e. in the local file system encoding.
         Use <code>git.pathEncoding</code> option to specify encoding to use when translating string path found in Subversion repository to Git. 
         Most modern file systems use or could be configured to use UTF-8 encoding and this is default and recommended value.</para>
-        </formalpara>
-
-        <formalpara><title>Adjust Subversion project location and branches mapping:</title>
+        </sect1>
+        <sect1><title>Adjust configuration: branches mapping</title>
         <para>
         <literallayout><code>[svn]
     ... 
@@ -463,8 +463,84 @@ branches = branches/*:refs/heads/*;release_branhces/b1:refs/release/b1</code></l
         Be careful when specifying mapping, it would not be possible to adjust it when synchronization is enabled. Only branches and tags
         that are included in the mapping will be imported and kept in sync by SubGit.
         </para>
+        </sect1>
+        <sect1><title>Adjust configuration: credentials</title>
+        <para>In order to create new revision in Subversion repository, SubGit needs credentials to authorize itself with Subversion server. 
+        SubGit user may provide multiple sets of credentials (username/password pairs) so that SubGit could choose with username to 
+        authorize with when creating new revision. There are a few sources SubGit looks for credentials:
+        </para>
+        <formalpara><title>GIT_REPOS/subgit/passwd file:</title>
+        <para>SubGit looks into <code>GIT_REPOS/subgit/passwd</code> file to read username/password pairs. Passwords are expected to 
+        be plaintext. It is a good idea to limit file read access for this file to the user account that runs SubGit.</para>
+<literallayout><code>    username password
+    username1 secret
+    ...
+    usernameN anothersecret
+</code></literallayout>
+<para>Path to the <code>GIT_REPOS/subgit/passwd</code> file could be changed in SubGit confgiruation file:</para>
+        <literallayout><code>[auth "default"]
+    ... 
+    passwords = subgit/passwd</code></literallayout>
         </formalpara>
-        <formalpara><title>Set revision to start translation from:</title>
+    <formalpara><title>SubGit configuration file:</title>
+    <para>SSH and SSL client credentials could be defined explicitly in <code>subgit/config</code> configuration file:</para>
+        <literallayout><code>[auth "default"]
+    ... 
+    sshKeyFile = /home/user/ssh-private-key.openssh
+    sshKeyFilePassphrase = secret
+
+    sslClientCertFile = /home/user/ssl-client-cert.p12
+    sslClientCertPassphrase = secret</code></literallayout>
+    </formalpara>
+        <formalpara><title>Local Subversion credentials cache:</title>
+        <para>To make SubGit look for credentials in the local Subversion credentials cache, set <code>auth.useDefaultSubversionConfigurationDirectory</code> option
+        to <code>true</code> and ensure that Subversion credentials cache path is correct:</para>
+        <literallayout><code>[auth "default"]
+    ... 
+    useDefaultSubversionConfigurationDirectory = true
+    subversionConfigurationDirectory = /home/user/.subversion</code></literallayout>
+    <note><title>HTTP Proxy Configuration</title><para>In case Subversion repository access requires proxy to be configured, then <code>auth.useDefaultSubversionConfigurationDirectory</code>
+    must be set to <code>true</code> and proxy settings should be defined in Subversion <code>servers</code> file.</para></note>
+        </formalpara>
+        </sect1>
+        <sect1><title>Credentials and Subversion pre-revprop-change hook</title>
+        <para>To create new Subversion revision, SubGit has to authroize with Subversion server. In order to do this,
+        SubGit follows the following algorithm:
+        <itemizedlist>
+        <listitem>Git commit author is matched to Subversion author name (<code>AUTHOR</code>)</listitem>
+        <listitem>All configured credentials sources are iterated to find
+        <code>AUTHOR</code>'s credentials</listitem>
+        <listitem>In case matching credentials found, SubGit uses them for authorization</listitem>
+        <listitem>In case no matching credentials has been found, SubGit uses any of the available</listitem>
+        <listitem>As soon as new revision is committed, SubGit sets its <code>svn:author</code> revision property to <code>AUTHOR</code></listitem>
+        </itemizedlist>
+        The most secure way to configure SubGit credentials is to provide single set of credentials (either explicitly in <code>subgit/passwd</code> file or
+        implicitly by specifying local Subversion configuration path). However, use of Subversion revision properties feature requires <code>pre-revprop-change</code> hook
+        to be enabled in Subversion repository. Add empty hook script with 0 exit code to enable revision properties:
+        <literallayout><code>
+SVN_REPOSITORY/
+    hooks/
+       <emphasis role="bold">pre-revprop-change</emphasis>     # for Linux and OS X
+       <emphasis role="bold">pre-revprop-change.bat</emphasis> # for Windows
+        </code></literallayout>
+        </para> 
+        <para>Hook file contents might be as simple as:</para>
+        <formalpara><title>Linux and OS X:</title><para>
+        <literallayout><code>#!/bin/sh
+exit 0;</code></literallayout>
+        </para>
+        </formalpara>
+        <formalpara><title>Windows:</title><para>
+        <literallayout><code>@echo off
+exit 0</code></literallayout>
+        </para>
+        </formalpara>
+        <para>Installing hooks to Subversion repository requires direct shell access to Subversion repository server. 
+        This might not always be available and in that case SubGit might fail to set proper author or date for a
+        newly created Subversion revisions.</para>
+        </sect1>
+        <sect1><title>Adjust configuration: other options</title>
+        
         <para>
         <literallayout><code>[svn]
     ...
@@ -472,27 +548,14 @@ branches = branches/*:refs/heads/*;release_branhces/b1:refs/release/b1</code></l
         Set <code>svn.minimalRevision</code> to Subversion revision from which translation should be started. Revisions older than specified 
         would not be translated and would not be present in the Git repository. Limiting range of revisions with this option may reduce initial
         translation time.</para>
-        </formalpara>
-
-        <formalpara><title>Provide credentials:</title>
-        <para></para>
-        </formalpara>
         <para>One will find more options in the <code>subgit/config</code> file, as well as documentation 
         on what these options control.</para>
         </sect1>
         <sect1><title>Run <code>subgit install</code></title>
-        <para>Run SubGit <code>install</code> command to make SubGit create Git repositories, perform initial translation from Subversion to Git 
-        and to enable synchronization.One have to run <code>configure</code> command on behalf of the same user account that would be used to access Subversion or Git repository. Use
-        <code>sudo</code> command on Linux or OS X or Administrator account on Windows if necessary. Examples below assume Ubuntu Linux and commands are ran on
-        behalf of <code>www-data</code> user that runs Apache Web Server on that system.</para>
-         
-        <para><code>install</code> command uses configuration previously generated by <code>configure</code> command or perform configuration stage itself in case
-        pregenerated configuration is not present. Subgit <code>install</code> command output when run on a single-project Subversion repository is shown below:
-<literallayout><code>$ [sudo -u www-data] <emphasis role="bold">subgit install svn_repository</emphasis>
-SubGit version 1.0.2 ('Miai') build #1730
-
-Subversion to Git mapping has been found:
-    <emphasis role="bold">&lt;root&gt; : /var/svn/svn_repository/.git</emphasis>
+        <para>Run SubGit <code>install</code> command to make SubGit perform initial translation from Subversion to Git 
+        and to enable synchronization.<code>install</code> command uses configuration previously generated by <code>configure</code> command. Sample Subgit <code>install</code> command output is shown below:
+<literallayout><code>$ <emphasis role="bold">subgit install repository.git</emphasis>
+SubGit version 2.0.0 ('Patrick') build #2552
 
 Translating Subversion revisions to Git commits...
 
@@ -500,12 +563,12 @@ Translating Subversion revisions to Git commits...
     Total time: 10 seconds.
 
 INSTALLATION SUCCESSFUL</code></literallayout>
-        Initial translation may take a while, however it would not affect Subversion repository - it remains fully functional during initial translation time.</para>
-        <para>SubGit <code>install</code> command creates Git repository and enables synchronization by installing hooks. Existing Subversion <code>pre-commit</code> and 
-        <code>post-commit</code> hooks are preserved and executed normally.
+        Initial translation may take a while, during translation time Git repository remains readable, but pushes are disabled for the time of
+        initial import. User could interrupt initial translation with Ctrl-C and resume it later by running <code>subgit install GIT_REPOS</code></para>
+        <para>SubGit <code>install</code> command enables synchronization by installing hooks into Git repository. Existing Git <code>pre-receive</code> and 
+        <code>post-receive</code> hooks ()if there were any) are preserved and executed normally.
 <figure id="repository-after-install"><title>Repository after <code>install</code> command is completed</title>         
-<literallayout><code>svn_repository/
-  <emphasis role="bold">.git/                           </emphasis># Git repository (bare)
+<literallayout><code>GIT_REPOS/
     branches/
     hooks/
         <emphasis role="bold">pre-receive               </emphasis># SubGit hook, do not edit or remove
@@ -516,23 +579,27 @@ INSTALLATION SUCCESSFUL</code></literallayout>
     objects/
     refs/
     svn/
+    subgit/
     config
-    HEAD            
-  conf/
-  db/
-  hooks/
-    <emphasis role="bold">pre-commit                    </emphasis># SubGit hook, do not edit or remove
-    <emphasis role="bold">user-pre-commit               </emphasis># user's pre-commit hook
-    <emphasis role="bold">post-commit                   </emphasis># SubGit hook, do not edit or remove
-    <emphasis role="bold">user-post-commit              </emphasis># user's post-commit hook
-  locks/
-  subgit/
-  format
-  README.txt</code></literallayout></figure>
-  As soon as <code>install</code> command reports successful termination, commits to Subversion repository will be immediately translated to the 
-  corresponding Git repository and vice versa - pushes to Git repository from its clones will be immediately translated to Subversion repository. 
-  With SubGit no special actions are required to maintain Subversion and Git repositories synchronized.
+    HEAD</code></literallayout></figure>
+  As soon as <code>install</code> command reports successful termination, Git users may start to push to the Git repository - new 
+  commits will be translated to the new Subversion repository revisions and vice versa - new Subversion revisions will be 
+  translated to the new Git commits.
         </para>
+        </sect1>
+        <sect1><title>Background translation daemon</title>
+        <para>Upon installation completion, SubGit launches background process that periodically checks Subversion repository for new
+        revisions. Whenever new revisions are found, they are translated to Git commits which means that Git repository remains up-to-date
+        most of the time. This background process is optional and could be killed. When background process is not running, new Subversion
+        revisions will be translated to Git commits on Git user <code>push</code> as part of the <code>pre-receive</code> hook processing.</para>
+        <para>Options that affect SubGit background process could be set in <code>GIT_REPOS/subgit/config</code> configuration file:</para>
+        <literallayout><code>[svn]
+   ...   
+   fetchInterval = 60      # check for new revisions every 60 seconds
+   ...
+   [daemon]
+   ...
+   idleTimeout = infinity  # backgroud process never exits</code></literallayout>
         </sect1>
         <sect1><title>Recommended client-side Git configuration</title>
         <para>Git users will clone Git repository on the server side to start working with the project locally.
