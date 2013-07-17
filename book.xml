@@ -17,9 +17,12 @@
     
     <chapter id="introduction">
         <title>Overview</title>
-        <para>SubGit is a tool for bidirectional Subversion and Git repositories synchronization. 
-              SubGit is written in Java and works on the server side, i.e. requires direct access to both Subversion and Git repositories over local file system.
+        <para>SubGit is a tool for bidirectional Subversion and Git repositories synchronization. SubGit is written in Java. 
         </para>
+        <para>For information on how to install SubGit into the <emphasis role="bold">local</emphasis> Subversion repository, refer to 
+        <emphasis role="bold"><ulink url="https://subgit.com/book/index.html">SubGit Local Book</ulink></emphasis>. This book
+        only covers the case when SubGit is used to create Git mirror of a remote Subversion repository.</para>
+        
         <para>Most commonly, SubGit user starts with Subversion repository being configured on the server. 
               Access to Subversion repository is available over network (with HTTP(s), plain svn or svn over SSH protocols) and over the local file system. 
               Correspondingly, users requests are handled by Apache Web Server, svnserve daemon or sshd daemon which invokes svnserve process. 
