@@ -614,7 +614,7 @@ INSTALLATION SUCCESSFUL</code></literallayout>
     <para>To force translation of the outstanding Subversion revisions, user may use <code>subgit fetch</code> command:</para>
         <literallayout><code>$ subgit fetch [--async] GIT_REPOS_PATH</code></literallayout>
     <para>Alternatively invoke a no-op push from a remote working tree: </para>
-        <literallayout><code>$ git push origin :bogus_branch</code></literallayout>
+        <literallayout><code>$ git push origin +:refs/heads/bogus_branch</code></literallayout>
         <para>Above command will attempt to delete non-existing remote branch and as a side effect will force SubGit to 
         synchronize Git and Subversion repositories.</para>
         <para>To stop background process gracefully use <code>shutdown</code> command:</para>
