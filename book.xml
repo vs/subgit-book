@@ -810,7 +810,12 @@ Registration information:
     This key has been used to register 1 repository; 
     You may use this key to register 9 more repositories (out of 10).
 
-REGISTRATION SUCCESSFUL</code></literallayout></para>
+    REGISTRATION SUCCESSFUL</code></literallayout></para>
+    <para>
+      On UNIX like operating systems: In order for <code>subgit</code> to inherit the correct <code>java</code> environment
+      you may need to run the <code>sudo</code>
+      with the <code>-E</code> option. See <code>man sudo</code> for details.
+    </para>
     </chapter>
 
     <chapter id="limitations">
