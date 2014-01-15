@@ -412,9 +412,13 @@ dmitry = Dmitry Pavlenko &lt;pavlenko@tmatesoft.com&gt;</code></literallayout></
         <literallayout><code>[core]
     ...
     defaultDomain = <emphasis role="bold">company.com</emphasis></code></literallayout>
-        Email have to be part of the Git author information, some of the Git operations may fail when email is not present. SubGit
-        will use <code>core.defaultDomain</code> value to generate author's email when author is not found in the authors mapping
+        Email has to be part of the Git author information and some of Git operations may fail when email is not present.
+        SubGit will use <code>core.defaultDomain</code> value to generate author's email when author is not found in the authors mapping
         or in case authors mapping doesn't provide email.</para>
+        </formalpara>
+        <formalpara>
+          Tip: Add author mappings for as many of you team members as possible, even if they don't use Git
+          as the log history will be more consistant.
         </formalpara>
         </sect1>
        <sect1><title>Adjust configuration: path encoding</title>
@@ -636,7 +640,10 @@ SHUTDOWN SUCCESSFUL</code></literallayout>
     ...
     <emphasis role="bold">fetch = +refs/svn/map:refs/notes/commits</emphasis></code></literallayout>
         <code>refs/notes/commmits</code> reference points to the so called notes that contains Subversion to Git 
-        mapping information for each commit. With these notes fetched <code>git log</code> command will show
+        mapping information for each commit.
+        Note that this <code>fetch</code> line should be added as a new line and
+        not appended to any existing <code>fetch</code> lines.
+        With these notes fetched <code>git log</code> command will show
         mapping information alongside with the commit message in the log output:
         <literallayout><code>$ git log
 commit bee5c8ae9bd8b2077f1acaedc9982ab4bd84d91b
@@ -803,7 +810,12 @@ Registration information:
     This key has been used to register 1 repository; 
     You may use this key to register 9 more repositories (out of 10).
 
-REGISTRATION SUCCESSFUL</code></literallayout></para>
+    REGISTRATION SUCCESSFUL</code></literallayout></para>
+    <para>
+      On UNIX like operating systems: In order for <code>subgit</code> to inherit the correct <code>java</code> environment
+      you may need to run the <code>sudo</code>
+      with the <code>-E</code> option. See <code>man sudo</code> for details.
+    </para>
     </chapter>
 
     <chapter id="limitations">
